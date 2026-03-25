@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
 
 const vehicleInitial = {
-  placa: "ABC1D23",
-  modelo: "Ford Ka",
-  ano: "2019",
+  placa: "PZI2B30",
+  modelo: "Ford/Ka Se ",
+  ano: "2017",
   combustivel: "Gasolina",
   mediaCidade: "12",
   potencia: "85 cv",
