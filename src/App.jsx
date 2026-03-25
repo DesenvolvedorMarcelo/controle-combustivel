@@ -2,11 +2,11 @@ import { useMemo, useState } from "react";
 
 const vehicleInitial = {
   placa: "ABC1D23",
-  modelo: "Fiat Uno 1.0",
-  ano: "2018",
+  modelo: "Ford Ka",
+  ano: "2019",
   combustivel: "Gasolina",
   mediaCidade: "12",
-  potencia: "75 cv",
+  potencia: "85 cv",
 };
 
 const abastecimentoInicial = {
