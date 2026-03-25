@@ -37,15 +37,14 @@ function dataLabel(data) {
 }
 
 export default function App() {
-  const [aba, setAba] = useState("inicio");
-  const [logado, setLogado] = useState(false);
+  const [aba, setAba] = useState("login");
   const [login, setLogin] = useState({ email: "", senha: "" });
   const [vehicle, setVehicle] = useState(vehicleInitial);
   const [form, setForm] = useState(abastecimentoInicial);
   const [historico, setHistorico] = useState([
-    { id: 1, data: "2026-03-18", kmAtual: 15240, litros: 28.5, valor: 152.9 },
-    { id: 2, data: "2026-03-20", kmAtual: 15510, litros: 26.4, valor: 144.5 },
-    { id: 3, data: "2026-03-22", kmAtual: 15828, litros: 29.1, valor: 164.2 },
+    { id: 1, data: "2026-03-18", kmAtual: 15240, litros: 25.8, valor: 145.0 },
+    { id: 2, data: "2026-03-20", kmAtual: 15602, litros: 30.2, valor: 170.0 },
+    { id: 3, data: "2026-03-22", kmAtual: 16152, litros: 28.5, valor: 152.0 },
   ]);
 
   const enriquecido = useMemo(() => {
@@ -71,24 +70,25 @@ export default function App() {
 
   const grafico = useMemo(() => {
     const base = validos.slice(-6);
-    if (!base.length) {
-      return [8.4, 9.2, 7.8, 10.1, 9.4, 11.3];
-    }
+    if (!base.length) return [10.5, 7.2, 5.0, 7.0, 8.7, 6.3];
     return base.map((item) => Number(item.consumoMedio.toFixed(1)));
   }, [validos]);
 
-  const loginSubmit = (e) => {
-    e.preventDefault();
-    setLogado(true);
-    setAba("inicio");
-  };
+  const ultimo = validos[validos.length - 1];
+  const semanaValor = historico.slice(-2).reduce((soma, item) => soma + Number(item.valor), 0);
+  const semanaKm = validos.slice(-2).reduce((soma, item) => soma + Number(item.kmRodados), 0);
 
-  const salvarVeiculo = (e) => {
+  function entrar(e) {
     e.preventDefault();
     setAba("inicio");
-  };
+  }
 
-  const adicionarAbastecimento = (e) => {
+  function salvarVeiculo(e) {
+    e.preventDefault();
+    setAba("veiculo");
+  }
+
+  function adicionarAbastecimento(e) {
     e.preventDefault();
     if (!form.data || !form.kmAtual || !form.litros || !form.valor) return;
 
@@ -104,261 +104,337 @@ export default function App() {
     setHistorico(atualizados);
     setForm(abastecimentoInicial);
     setAba("abastecimento");
-  };
+  }
 
-  const ultimo = validos[validos.length - 1];
-  const semanaValor = historico.slice(-2).reduce((soma, item) => soma + Number(item.valor), 0);
-  const semanaKm = validos.slice(-2).reduce((soma, item) => soma + Number(item.kmRodados), 0);
+  function TelaLogin() {
+    return (
+      <section style={styles.screenCard}>
+        <div style={styles.logoWrap}>
+          <div style={styles.logoIcon}>⛽</div>
+          <div style={styles.logoText}>Fuel Tracker</div>
+        </div>
+
+        <form onSubmit={entrar} style={styles.formStack}>
+          <input
+            style={styles.input}
+            placeholder="E-mail"
+            value={login.email}
+            onChange={(e) => setLogin({ ...login, email: e.target.value })}
+          />
+          <input
+            style={styles.input}
+            placeholder="Senha"
+            type="password"
+            value={login.senha}
+            onChange={(e) => setLogin({ ...login, senha: e.target.value })}
+          />
+          <div style={styles.smallLink}>Esqueceu a senha ?</div>
+          <button type="submit" style={styles.primaryButton}>
+            Entrar
+          </button>
+        </form>
+
+        <div style={styles.bottomPlainLink}>Cadastre-se</div>
+      </section>
+    );
+  }
+
+  function TelaVeiculo() {
+    return (
+      <section style={styles.screenCard}>
+        <div style={styles.headerRow}>
+          <span style={styles.backArrow}>‹</span>
+          <h2 style={styles.headerTitle}>Cadastro do Veículo</h2>
+        </div>
+
+        <form onSubmit={salvarVeiculo} style={styles.formStack}>
+          <div>
+            <label style={styles.label}>Placa:</label>
+            <input
+              style={styles.input}
+              value={vehicle.placa}
+              onChange={(e) => setVehicle({ ...vehicle, placa: e.target.value })}
+            />
+          </div>
+
+          <div>
+            <label style={styles.label}>Modelo:</label>
+            <input
+              style={styles.input}
+              value={vehicle.modelo}
+              onChange={(e) => setVehicle({ ...vehicle, modelo: e.target.value })}
+            />
+          </div>
+
+          <div>
+            <label style={styles.label}>Ano:</label>
+            <input
+              style={styles.input}
+              value={vehicle.ano}
+              onChange={(e) => setVehicle({ ...vehicle, ano: e.target.value })}
+            />
+          </div>
+
+          <div>
+            <label style={styles.label}>Combustível:</label>
+            <select
+              style={styles.input}
+              value={vehicle.combustivel}
+              onChange={(e) => setVehicle({ ...vehicle, combustivel: e.target.value })}
+            >
+              <option>Gasolina</option>
+              <option>Etanol</option>
+              <option>Flex</option>
+            </select>
+          </div>
+
+          <div>
+            <label style={styles.label}>Média Cidade (km/L):</label>
+            <input
+              style={styles.input}
+              value={vehicle.mediaCidade}
+              onChange={(e) => setVehicle({ ...vehicle, mediaCidade: e.target.value })}
+            />
+          </div>
+
+          <div>
+            <label style={styles.label}>Potência:</label>
+            <input
+              style={styles.input}
+              value={vehicle.potencia}
+              onChange={(e) => setVehicle({ ...vehicle, potencia: e.target.value })}
+            />
+          </div>
+
+          <button type="submit" style={styles.primaryButton}>
+            Salvar
+          </button>
+        </form>
+      </section>
+    );
+  }
+
+  function TelaAbastecimento() {
+    return (
+      <section style={styles.screenCard}>
+        <div style={styles.headerRow}>
+          <span style={styles.backArrow}>‹</span>
+          <h2 style={styles.headerTitle}>Registro de Abastecimento</h2>
+        </div>
+
+        <div style={styles.topMetricGrid3}>
+          <div style={styles.metricCardGreen}>
+            <div style={styles.metricLabel}>KM Rodados</div>
+            <div style={styles.metricValueSmall}>{Math.round(semanaKm)} km</div>
+          </div>
+          <div style={styles.metricCardBlue}>
+            <div style={styles.metricLabel}>Consumo Médio</div>
+            <div style={styles.metricValueSmall}>{numero(resumo.consumoMedio)} km/L</div>
+          </div>
+          <div style={styles.metricCardBlue}>
+            <div style={styles.metricLabel}>Custo por</div>
+            <div style={styles.metricValueSmall}>{moeda(resumo.custoPorKm)}</div>
+          </div>
+        </div>
+
+        <div style={styles.historyList}>
+          {enriquecido
+            .slice()
+            .reverse()
+            .map((item) => (
+              <div key={item.id} style={styles.historyRow}>
+                <div style={styles.historyLeft}>
+                  <div style={styles.historyDate}>
+                    {dataLabel(item.data)} · {numero(item.litros)} L · {moeda(item.valor)}
+                  </div>
+                </div>
+                <div style={styles.historyRight}>
+                  {item.kmRodados > 0 ? `${Math.round(item.kmRodados)} km` : `${item.kmAtual} km`}
+                </div>
+              </div>
+            ))}
+        </div>
+
+        <form onSubmit={adicionarAbastecimento} style={styles.formStackCompact}>
+          <input
+            style={styles.input}
+            type="date"
+            value={form.data}
+            onChange={(e) => setForm({ ...form, data: e.target.value })}
+          />
+          <input
+            style={styles.input}
+            placeholder="KM Atual"
+            value={form.kmAtual}
+            onChange={(e) => setForm({ ...form, kmAtual: e.target.value })}
+          />
+          <input
+            style={styles.input}
+            placeholder="Litros"
+            value={form.litros}
+            onChange={(e) => setForm({ ...form, litros: e.target.value })}
+          />
+          <input
+            style={styles.input}
+            placeholder="Valor"
+            value={form.valor}
+            onChange={(e) => setForm({ ...form, valor: e.target.value })}
+          />
+          <button type="submit" style={styles.primaryButton}>
+            + Adicionar Abastecimento
+          </button>
+        </form>
+      </section>
+    );
+  }
+
+  function TelaAnalise() {
+    return (
+      <section style={styles.screenCard}>
+        <div style={styles.headerRow}>
+          <span style={styles.backArrow}>‹</span>
+          <h2 style={styles.headerTitle}>Análise de Consumo</h2>
+        </div>
+
+        <div style={styles.topMetricGrid2}>
+          <div style={styles.metricCardGreen}>
+            <div style={styles.metricLabel}>Esta Semana</div>
+            <div style={styles.metricValueBig}>{moeda(semanaValor)}</div>
+            <div style={styles.metricSub}>{Math.round(semanaKm)} km</div>
+          </div>
+          <div style={styles.metricCardBlue}>
+            <div style={styles.metricLabel}>Este Mês</div>
+            <div style={styles.metricValueBig}>{moeda(resumo.totalValor)}</div>
+            <div style={styles.metricSub}>{Math.round(resumo.totalKm)} km</div>
+          </div>
+        </div>
+
+        <div style={styles.chartCard}>
+          <div style={styles.chartTitle}>Desempenho de Consumo</div>
+
+          <div style={styles.chartArea}>
+            {grafico.map((valor, index) => (
+              <div key={index} style={styles.chartColumnWrap}>
+                <div
+                  style={{
+                    ...styles.chartBar,
+                    height: `${Math.max(24, valor * 10)}px`,
+                  }}
+                />
+                <div style={styles.chartDay}>
+                  {["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"][index] || `#${index + 1}`}
+                </div>
+              </div>
+            ))}
+
+            <svg style={styles.chartSvg} viewBox="0 0 320 150" preserveAspectRatio="none">
+              <polyline
+                fill="none"
+                stroke="#42a5ff"
+                strokeWidth="3"
+                points={grafico.map((valor, index) => `${24 + index * 54},${132 - valor * 8}`).join(" ")}
+              />
+            </svg>
+          </div>
+        </div>
+
+        <div style={styles.bottomMetricGrid2}>
+          <div style={styles.bottomMetricCard}>
+            <div style={styles.metricLabel}>Média Semanal</div>
+            <div style={styles.bottomMetricValue}>{numero(resumo.consumoMedio)} km/L</div>
+          </div>
+          <div style={styles.bottomMetricCard}>
+            <div style={styles.metricLabel}>Custo Semanal</div>
+            <div style={styles.bottomMetricValue}>{moeda(semanaValor)}</div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  function TelaInicio() {
+    return (
+      <section style={styles.screenCard}>
+        <div style={styles.screenTitleBig}>Controle de Combustível</div>
+        <div style={styles.screenSub}>Visual escuro, exclusivo e responsivo com estilo mobile</div>
+
+        <div style={styles.topMetricGrid4}>
+          <div style={styles.metricCardBlue}>
+            <div style={styles.metricLabel}>Gastos da Vida</div>
+            <div style={styles.metricValueBig}>{moeda(resumo.totalValor)}</div>
+          </div>
+          <div style={styles.metricCardBlue}>
+            <div style={styles.metricLabel}>KM Rodados</div>
+            <div style={styles.metricValueBig}>{Math.round(resumo.totalKm)} km</div>
+          </div>
+          <div style={styles.metricCardBlue}>
+            <div style={styles.metricLabel}>Consumo Médio</div>
+            <div style={styles.metricValueBig}>{numero(resumo.consumoMedio)} km/L</div>
+          </div>
+          <div style={styles.metricCardBlue}>
+            <div style={styles.metricLabel}>Economia</div>
+            <div style={styles.metricValueBig}>82%</div>
+          </div>
+        </div>
+
+        <div style={styles.chartCardLarge}>
+          <div style={styles.chartTitle}>Desempenho Semanal</div>
+          <div style={styles.chartLineBarMix}>
+            {grafico.map((valor, index) => (
+              <div key={index} style={styles.chartColumnWrap}>
+                <div style={{ ...styles.miniBlueBar, width: "100%" }} />
+                <div style={styles.chartDay}>
+                  {["SEG", "TER", "QUA", "QUI", "SEX", "SAB"][index] || `#${index + 1}`}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={styles.bottomMetricGrid2}>
+          <div style={styles.bottomMetricCard}>
+            <div style={styles.metricLabel}>Último Abastecimento</div>
+            <div style={styles.bottomMetricValue}>{ultimo ? `${Math.round(ultimo.litros)} L` : "51 L"}</div>
+            <div style={styles.metricSub}>{ultimo ? dataLabel(ultimo.data) : "15/04/24"}</div>
+          </div>
+          <div style={styles.bottomMetricCard}>
+            <div style={styles.metricLabel}>Custo por KM</div>
+            <div style={styles.bottomMetricValue}>{moeda(resumo.custoPorKm)}</div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <div style={styles.page}>
       <style>{css}</style>
-      <div style={styles.shell}>
-        <div style={styles.appFrame}>
-          <div style={styles.glowA} />
-          <div style={styles.glowB} />
+      <div style={styles.mobileShell}>
+        <div style={styles.mobileFrame}>
+          {aba === "login" && <TelaLogin />}
+          {aba === "inicio" && <TelaInicio />}
+          {aba === "veiculo" && <TelaVeiculo />}
+          {aba === "abastecimento" && <TelaAbastecimento />}
+          {aba === "analise" && <TelaAnalise />}
 
-          <header style={styles.topbar}>
-            <div>
-              <div style={styles.brandRow}>
-                <span style={styles.brandIcon}>⛽</span>
-                <span style={styles.brandText}>Fuel Tracker</span>
-              </div>
-              <div style={styles.subtitle}>Controle premium para consumo de combustível</div>
-            </div>
-            <div style={styles.statusBadge}>{logado ? "Online" : "Visitante"}</div>
-          </header>
-
-          {!logado && (
-            <section style={styles.phoneCard}>
-              <div style={styles.sectionHeader}>
-                <h2 style={styles.sectionTitle}>Entrar</h2>
-                <span style={styles.sectionMini}>Acesso seguro</span>
-              </div>
-              <form onSubmit={loginSubmit} style={styles.formStack}>
-                <input
-                  style={styles.input}
-                  placeholder="E-mail"
-                  value={login.email}
-                  onChange={(e) => setLogin({ ...login, email: e.target.value })}
-                />
-                <input
-                  style={styles.input}
-                  placeholder="Senha"
-                  type="password"
-                  value={login.senha}
-                  onChange={(e) => setLogin({ ...login, senha: e.target.value })}
-                />
-                <button style={styles.primaryButton} type="submit">Entrar</button>
-              </form>
-              <div style={styles.footerLink}>Esqueceu a senha?</div>
-            </section>
-          )}
-
-          {logado && (
-            <>
-              {aba === "inicio" && (
-                <section style={styles.screenGrid}>
-                  <div style={styles.heroCard}>
-                    <div style={styles.heroHeader}>
-                      <div>
-                        <div style={styles.sectionMini}>Visão geral</div>
-                        <h2 style={styles.heroTitle}>Controle de Combustível</h2>
-                      </div>
-                      <div style={styles.heroPill}>Atualizado agora</div>
-                    </div>
-
-                    <div style={styles.kpiGrid}>
-                      <div style={styles.kpiCardGreen}>
-                        <span style={styles.kpiLabel}>Gasto total</span>
-                        <strong style={styles.kpiValue}>{moeda(resumo.totalValor)}</strong>
-                      </div>
-                      <div style={styles.kpiCardBlue}>
-                        <span style={styles.kpiLabel}>KM rodados</span>
-                        <strong style={styles.kpiValue}>{Math.round(resumo.totalKm)} km</strong>
-                      </div>
-                      <div style={styles.kpiCardBlue}>
-                        <span style={styles.kpiLabel}>Consumo médio</span>
-                        <strong style={styles.kpiValue}>{numero(resumo.consumoMedio)} km/L</strong>
-                      </div>
-                      <div style={styles.kpiCardBlue}>
-                        <span style={styles.kpiLabel}>Custo por km</span>
-                        <strong style={styles.kpiValue}>{moeda(resumo.custoPorKm)}</strong>
-                      </div>
-                    </div>
-
-                    <div style={styles.chartCard}>
-                      <div style={styles.chartHeader}>
-                        <span style={styles.chartTitle}>Desempenho de Consumo</span>
-                        <span style={styles.chartMini}>Últimos ciclos</span>
-                      </div>
-                      <div style={styles.chartArea}>
-                        {grafico.map((valor, index) => (
-                          <div key={index} style={styles.chartColumnWrap}>
-                            <div
-                              style={{
-                                ...styles.chartBar,
-                                height: `${Math.max(30, valor * 9)}px`,
-                              }}
-                            />
-                            <span style={styles.chartDay}>{["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"][index] || `#${index + 1}`}</span>
-                          </div>
-                        ))}
-                        <svg style={styles.lineSvg} viewBox="0 0 320 140" preserveAspectRatio="none">
-                          <polyline
-                            fill="none"
-                            stroke="#4da3ff"
-                            strokeWidth="3"
-                            points={grafico
-                              .map((valor, index) => `${20 + index * 56},${130 - valor * 8}`)
-                              .join(" ")}
-                          />
-                        </svg>
-                      </div>
-                    </div>
-
-                    <div style={styles.bottomSummary}>
-                      <div style={styles.summaryTile}>
-                        <span style={styles.kpiLabel}>Último abastecimento</span>
-                        <strong style={styles.summaryValue}>{ultimo ? `${Math.round(ultimo.litros)} L` : "--"}</strong>
-                        <small style={styles.summaryMini}>{ultimo ? dataLabel(ultimo.data) : "sem dados"}</small>
-                      </div>
-                      <div style={styles.summaryTile}>
-                        <span style={styles.kpiLabel}>Custo atual/KM</span>
-                        <strong style={styles.summaryValue}>{ultimo ? moeda(ultimo.custoPorKm) : "R$ 0,00"}</strong>
-                        <small style={styles.summaryMini}>último ciclo</small>
-                      </div>
-                    </div>
-                  </div>
-                </section>
-              )}
-
-              {aba === "veiculo" && (
-                <section style={styles.phoneCard}>
-                  <div style={styles.sectionHeader}>
-                    <h2 style={styles.sectionTitle}>Cadastro do Veículo</h2>
-                    <span style={styles.sectionMini}>Dados principais</span>
-                  </div>
-                  <form onSubmit={salvarVeiculo} style={styles.formStack}>
-                    <input style={styles.input} placeholder="Placa" value={vehicle.placa} onChange={(e) => setVehicle({ ...vehicle, placa: e.target.value })} />
-                    <input style={styles.input} placeholder="Modelo" value={vehicle.modelo} onChange={(e) => setVehicle({ ...vehicle, modelo: e.target.value })} />
-                    <input style={styles.input} placeholder="Ano" value={vehicle.ano} onChange={(e) => setVehicle({ ...vehicle, ano: e.target.value })} />
-                    <input style={styles.input} placeholder="Combustível" value={vehicle.combustivel} onChange={(e) => setVehicle({ ...vehicle, combustivel: e.target.value })} />
-                    <input style={styles.input} placeholder="Média Cidade (km/L)" value={vehicle.mediaCidade} onChange={(e) => setVehicle({ ...vehicle, mediaCidade: e.target.value })} />
-                    <input style={styles.input} placeholder="Potência" value={vehicle.potencia} onChange={(e) => setVehicle({ ...vehicle, potencia: e.target.value })} />
-                    <button style={styles.primaryButton} type="submit">Salvar</button>
-                  </form>
-                </section>
-              )}
-
-              {aba === "abastecimento" && (
-                <section style={styles.phoneCard}>
-                  <div style={styles.sectionHeader}>
-                    <h2 style={styles.sectionTitle}>Registro de Abastecimento</h2>
-                    <span style={styles.sectionMini}>Controle detalhado</span>
-                  </div>
-
-                  <div style={styles.kpiGridSmall}>
-                    <div style={styles.kpiCardGreen}>
-                      <span style={styles.kpiLabel}>KM Rodados</span>
-                      <strong style={styles.kpiValue}>{Math.round(semanaKm)} km</strong>
-                    </div>
-                    <div style={styles.kpiCardBlue}>
-                      <span style={styles.kpiLabel}>Consumo Médio</span>
-                      <strong style={styles.kpiValue}>{numero(resumo.consumoMedio)} km/L</strong>
-                    </div>
-                    <div style={styles.kpiCardBlue}>
-                      <span style={styles.kpiLabel}>Custo por KM</span>
-                      <strong style={styles.kpiValue}>{moeda(resumo.custoPorKm)}</strong>
-                    </div>
-                  </div>
-
-                  <form onSubmit={adicionarAbastecimento} style={styles.formStackCompact}>
-                    <input style={styles.input} type="date" value={form.data} onChange={(e) => setForm({ ...form, data: e.target.value })} />
-                    <input style={styles.input} placeholder="KM Atual" value={form.kmAtual} onChange={(e) => setForm({ ...form, kmAtual: e.target.value })} />
-                    <input style={styles.input} placeholder="Litros" value={form.litros} onChange={(e) => setForm({ ...form, litros: e.target.value })} />
-                    <input style={styles.input} placeholder="Valor" value={form.valor} onChange={(e) => setForm({ ...form, valor: e.target.value })} />
-                    <button style={styles.primaryButton} type="submit">+ Adicionar Abastecimento</button>
-                  </form>
-
-                  <div style={styles.listWrap}>
-                    {enriquecido.slice().reverse().map((item) => (
-                      <div key={item.id} style={styles.listItem}>
-                        <div>
-                          <strong style={styles.listDate}>{dataLabel(item.data)}</strong>
-                          <div style={styles.listMeta}>{numero(item.litros, 1)} L • {moeda(item.valor)}</div>
-                        </div>
-                        <div style={styles.listKm}>{item.kmRodados > 0 ? `${Math.round(item.kmRodados)} km` : `${Math.round(item.kmAtual)} km`}</div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              )}
-
-              {aba === "analise" && (
-                <section style={styles.phoneCard}>
-                  <div style={styles.sectionHeader}>
-                    <h2 style={styles.sectionTitle}>Análise de Consumo</h2>
-                    <span style={styles.sectionMini}>Resumo financeiro</span>
-                  </div>
-
-                  <div style={styles.topDuo}>
-                    <div style={styles.kpiCardGreen}>
-                      <span style={styles.kpiLabel}>Esta Semana</span>
-                      <strong style={styles.kpiValue}>{moeda(semanaValor)}</strong>
-                      <small style={styles.summaryMini}>{Math.round(semanaKm)} km</small>
-                    </div>
-                    <div style={styles.kpiCardBlue}>
-                      <span style={styles.kpiLabel}>Este Mês</span>
-                      <strong style={styles.kpiValue}>{moeda(resumo.totalValor)}</strong>
-                      <small style={styles.summaryMini}>{Math.round(resumo.totalKm)} km</small>
-                    </div>
-                  </div>
-
-                  <div style={styles.chartCard}>
-                    <div style={styles.chartHeader}>
-                      <span style={styles.chartTitle}>Desempenho de Consumo</span>
-                    </div>
-                    <div style={styles.chartArea}>
-                      {grafico.map((valor, index) => (
-                        <div key={index} style={styles.chartColumnWrap}>
-                          <div style={{ ...styles.chartBar, height: `${Math.max(28, valor * 9)}px` }} />
-                          <span style={styles.chartDay}>{["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"][index] || `#${index + 1}`}</span>
-                        </div>
-                      ))}
-                      <svg style={styles.lineSvg} viewBox="0 0 320 140" preserveAspectRatio="none">
-                        <polyline
-                          fill="none"
-                          stroke="#4da3ff"
-                          strokeWidth="3"
-                          points={grafico
-                            .map((valor, index) => `${20 + index * 56},${130 - valor * 8}`)
-                            .join(" ")}
-                        />
-                      </svg>
-                    </div>
-                  </div>
-
-                  <div style={styles.bottomSummary}>
-                    <div style={styles.summaryTile}>
-                      <span style={styles.kpiLabel}>Média Semanal</span>
-                      <strong style={styles.summaryValue}>{numero(resumo.consumoMedio)} km/L</strong>
-                    </div>
-                    <div style={styles.summaryTile}>
-                      <span style={styles.kpiLabel}>Custo Semanal</span>
-                      <strong style={styles.summaryValue}>{moeda(semanaValor)}</strong>
-                    </div>
-                  </div>
-                </section>
-              )}
-
-              <nav style={styles.bottomNav}>
-                <button onClick={() => setAba("inicio")} style={aba === "inicio" ? styles.navBtnActive : styles.navBtn}>Início</button>
-                <button onClick={() => setAba("veiculo")} style={aba === "veiculo" ? styles.navBtnActive : styles.navBtn}>Veículo</button>
-                <button onClick={() => setAba("abastecimento")} style={aba === "abastecimento" ? styles.navBtnActive : styles.navBtn}>Abastecer</button>
-                <button onClick={() => setAba("analise")} style={aba === "analise" ? styles.navBtnActive : styles.navBtn}>Análise</button>
-              </nav>
-            </>
+          {aba !== "login" && (
+            <nav style={styles.bottomNav}>
+              <button style={aba === "inicio" ? styles.navActive : styles.navBtn} onClick={() => setAba("inicio")}>
+                Início
+              </button>
+              <button style={aba === "veiculo" ? styles.navActive : styles.navBtn} onClick={() => setAba("veiculo")}>
+                Veículo
+              </button>
+              <button
+                style={aba === "abastecimento" ? styles.navActive : styles.navBtn}
+                onClick={() => setAba("abastecimento")}
+              >
+                Abastecimento
+              </button>
+              <button style={aba === "analise" ? styles.navActive : styles.navBtn} onClick={() => setAba("analise")}>
+                Histórico
+              </button>
+            </nav>
           )}
         </div>
       </div>
@@ -369,236 +445,203 @@ export default function App() {
 const styles = {
   page: {
     minHeight: "100vh",
-    background: "radial-gradient(circle at top, #102447 0%, #08111f 45%, #02060d 100%)",
+    background: "radial-gradient(circle at top, #0b1d38 0%, #07101f 55%, #03070d 100%)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    padding: "24px",
+    padding: "20px",
     fontFamily: "Inter, Arial, sans-serif",
   },
-  shell: {
+  mobileShell: {
     width: "100%",
-    maxWidth: "430px",
+    maxWidth: "390px",
   },
-  appFrame: {
-    position: "relative",
-    overflow: "hidden",
-    minHeight: "860px",
+  mobileFrame: {
+    minHeight: "820px",
     borderRadius: "34px",
-    border: "1px solid rgba(255,255,255,0.10)",
-    background: "linear-gradient(180deg, rgba(8,18,35,0.98) 0%, rgba(6,14,27,0.98) 100%)",
-    boxShadow: "0 30px 80px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.05)",
+    background: "linear-gradient(180deg, #08111f 0%, #0a1630 100%)",
+    border: "1px solid rgba(255,255,255,0.08)",
+    boxShadow: "0 24px 80px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04)",
+    overflow: "hidden",
     padding: "18px",
+    position: "relative",
   },
-  glowA: {
-    position: "absolute",
-    width: "220px",
-    height: "220px",
-    top: "-60px",
-    right: "-80px",
-    background: "radial-gradient(circle, rgba(55,111,255,0.28) 0%, rgba(55,111,255,0) 70%)",
-    pointerEvents: "none",
+  screenCard: {
+    borderRadius: "22px",
+    background: "linear-gradient(180deg, rgba(15,28,52,0.98) 0%, rgba(10,19,35,0.98) 100%)",
+    border: "1px solid rgba(255,255,255,0.06)",
+    padding: "18px",
+    minHeight: "710px",
   },
-  glowB: {
-    position: "absolute",
-    width: "240px",
-    height: "240px",
-    bottom: "-120px",
-    left: "-100px",
-    background: "radial-gradient(circle, rgba(0,224,168,0.18) 0%, rgba(0,224,168,0) 70%)",
-    pointerEvents: "none",
-  },
-  topbar: {
-    display: "flex",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    gap: "12px",
-    marginBottom: "18px",
-  },
-  brandRow: {
+  logoWrap: {
     display: "flex",
     alignItems: "center",
     gap: "10px",
+    marginBottom: "42px",
+    marginTop: "8px",
+  },
+  logoIcon: {
+    fontSize: "30px",
+  },
+  logoText: {
+    color: "#f2f6ff",
+    fontSize: "16px",
     fontWeight: 700,
-    color: "#f5f7fb",
-    fontSize: "30px",
-  },
-  brandIcon: {
-    fontSize: "30px",
-  },
-  brandText: {
-    fontSize: "15px",
-    letterSpacing: "0.3px",
-  },
-  subtitle: {
-    marginTop: "6px",
-    color: "#91a3c2",
-    fontSize: "12px",
-  },
-  statusBadge: {
-    padding: "8px 12px",
-    borderRadius: "999px",
-    background: "rgba(255,255,255,0.06)",
-    border: "1px solid rgba(255,255,255,0.10)",
-    color: "#c7d6f2",
-    fontSize: "11px",
-  },
-  screenGrid: {
-    display: "grid",
-    gridTemplateColumns: "1fr",
-  },
-  heroCard: {
-    position: "relative",
-    borderRadius: "26px",
-    padding: "18px",
-    background: "linear-gradient(180deg, rgba(18,31,58,0.95) 0%, rgba(10,20,39,0.95) 100%)",
-    border: "1px solid rgba(255,255,255,0.08)",
-    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
-  },
-  heroHeader: {
-    display: "flex",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    gap: "10px",
-    marginBottom: "16px",
-  },
-  heroTitle: {
-    margin: 0,
-    color: "#f7f9fd",
-    fontSize: "22px",
-    lineHeight: 1.1,
-  },
-  heroPill: {
-    borderRadius: "999px",
-    padding: "8px 12px",
-    fontSize: "11px",
-    background: "rgba(77,163,255,0.12)",
-    color: "#9cc7ff",
-    border: "1px solid rgba(77,163,255,0.25)",
-  },
-  sectionHeader: {
-    display: "flex",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    gap: "10px",
-    marginBottom: "14px",
-  },
-  sectionTitle: {
-    margin: 0,
-    color: "#f7f9fd",
-    fontSize: "22px",
-  },
-  sectionMini: {
-    color: "#90a4c3",
-    fontSize: "12px",
-  },
-  phoneCard: {
-    borderRadius: "26px",
-    padding: "18px",
-    background: "linear-gradient(180deg, rgba(18,31,58,0.95) 0%, rgba(10,20,39,0.95) 100%)",
-    border: "1px solid rgba(255,255,255,0.08)",
-    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
   },
   formStack: {
     display: "grid",
-    gap: "12px",
+    gap: "14px",
+    marginTop: "18px",
   },
   formStackCompact: {
     display: "grid",
     gap: "10px",
-    marginTop: "14px",
-    marginBottom: "16px",
+    marginTop: "18px",
+  },
+  label: {
+    display: "block",
+    color: "#d9e3f8",
+    fontSize: "13px",
+    marginBottom: "6px",
+    fontWeight: 600,
   },
   input: {
     width: "100%",
     boxSizing: "border-box",
-    borderRadius: "14px",
-    border: "1px solid rgba(255,255,255,0.10)",
+    borderRadius: "10px",
+    border: "1px solid rgba(255,255,255,0.12)",
     background: "rgba(255,255,255,0.04)",
-    color: "#f6f8fc",
-    padding: "14px 14px",
+    color: "#f7f9fe",
+    padding: "12px 12px",
+    fontSize: "14px",
     outline: "none",
+  },
+  smallLink: {
+    textAlign: "right",
+    color: "#98abd0",
+    fontSize: "12px",
+    marginTop: "-4px",
+  },
+  bottomPlainLink: {
+    textAlign: "center",
+    color: "#9db3da",
+    marginTop: "120px",
     fontSize: "14px",
   },
   primaryButton: {
+    marginTop: "4px",
     border: 0,
-    borderRadius: "14px",
-    padding: "14px 16px",
-    background: "linear-gradient(180deg, #2f7ef7 0%, #1058d4 100%)",
-    color: "white",
+    borderRadius: "10px",
+    padding: "13px 16px",
+    background: "linear-gradient(180deg, #2e80f8 0%, #1359d4 100%)",
+    color: "#fff",
     fontWeight: 700,
     fontSize: "15px",
     cursor: "pointer",
-    boxShadow: "0 10px 25px rgba(19,99,255,0.35)",
+    boxShadow: "0 10px 24px rgba(34,103,255,0.35)",
   },
-  footerLink: {
-    marginTop: "14px",
-    textAlign: "center",
-    color: "#87a4d1",
-    fontSize: "13px",
-  },
-  kpiGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(2, 1fr)",
-    gap: "12px",
-    marginBottom: "16px",
-  },
-  kpiGridSmall: {
-    display: "grid",
-    gridTemplateColumns: "repeat(3, 1fr)",
-    gap: "10px",
-    marginBottom: "14px",
-  },
-  kpiCardGreen: {
-    borderRadius: "18px",
-    padding: "14px",
-    background: "linear-gradient(180deg, rgba(23,57,51,0.95) 0%, rgba(15,39,35,0.95) 100%)",
-    border: "1px solid rgba(60,214,153,0.20)",
-    boxShadow: "inset 0 -3px 0 rgba(67,232,169,0.55)",
-    display: "flex",
-    flexDirection: "column",
-    gap: "6px",
-  },
-  kpiCardBlue: {
-    borderRadius: "18px",
-    padding: "14px",
-    background: "linear-gradient(180deg, rgba(19,35,61,0.95) 0%, rgba(13,25,44,0.95) 100%)",
-    border: "1px solid rgba(77,163,255,0.18)",
-    boxShadow: "inset 0 -3px 0 rgba(77,163,255,0.5)",
-    display: "flex",
-    flexDirection: "column",
-    gap: "6px",
-  },
-  kpiLabel: {
-    fontSize: "11px",
-    color: "#95a7c5",
-  },
-  kpiValue: {
-    fontSize: "22px",
-    color: "#ffffff",
-    lineHeight: 1.1,
-  },
-  chartCard: {
-    borderRadius: "22px",
-    padding: "16px",
-    background: "rgba(7,16,31,0.78)",
-    border: "1px solid rgba(255,255,255,0.06)",
-    marginBottom: "16px",
-  },
-  chartHeader: {
+  headerRow: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "space-between",
+    gap: "10px",
+    marginBottom: "18px",
+  },
+  backArrow: {
+    color: "#f4f7ff",
+    fontSize: "28px",
+    lineHeight: 1,
+  },
+  headerTitle: {
+    margin: 0,
+    color: "#f5f8ff",
+    fontSize: "21px",
+    fontWeight: 700,
+  },
+  screenTitleBig: {
+    color: "#f4f8ff",
+    fontWeight: 700,
+    fontSize: "22px",
+    marginBottom: "4px",
+  },
+  screenSub: {
+    color: "#8ea2c7",
+    fontSize: "11px",
     marginBottom: "14px",
   },
-  chartTitle: {
-    color: "#f5f8ff",
+  topMetricGrid4: {
+    display: "grid",
+    gridTemplateColumns: "repeat(4, 1fr)",
+    gap: "8px",
+    marginBottom: "14px",
+  },
+  topMetricGrid3: {
+    display: "grid",
+    gridTemplateColumns: "repeat(3, 1fr)",
+    gap: "8px",
+    marginBottom: "14px",
+  },
+  topMetricGrid2: {
+    display: "grid",
+    gridTemplateColumns: "repeat(2, 1fr)",
+    gap: "10px",
+    marginBottom: "16px",
+  },
+  metricCardBlue: {
+    borderRadius: "12px",
+    padding: "10px",
+    background: "linear-gradient(180deg, rgba(20,35,62,0.98) 0%, rgba(12,24,45,0.98) 100%)",
+    border: "1px solid rgba(83,162,255,0.18)",
+    boxShadow: "inset 0 -3px 0 rgba(62,151,255,0.55)",
+  },
+  metricCardGreen: {
+    borderRadius: "12px",
+    padding: "10px",
+    background: "linear-gradient(180deg, rgba(20,54,45,0.98) 0%, rgba(12,35,30,0.98) 100%)",
+    border: "1px solid rgba(64,220,150,0.2)",
+    boxShadow: "inset 0 -3px 0 rgba(51,224,147,0.58)",
+  },
+  metricLabel: {
+    color: "#9db0d3",
+    fontSize: "10px",
+    marginBottom: "6px",
+  },
+  metricValueBig: {
+    color: "#ffffff",
+    fontWeight: 700,
+    fontSize: "16px",
+    lineHeight: 1.1,
+  },
+  metricValueSmall: {
+    color: "#ffffff",
     fontWeight: 700,
     fontSize: "15px",
+    lineHeight: 1.15,
   },
-  chartMini: {
-    color: "#8ea6cb",
+  metricSub: {
+    color: "#a7b9dc",
     fontSize: "11px",
+    marginTop: "4px",
+  },
+  chartCard: {
+    borderRadius: "16px",
+    background: "rgba(7,14,26,0.75)",
+    border: "1px solid rgba(255,255,255,0.06)",
+    padding: "14px",
+    marginBottom: "16px",
+  },
+  chartCardLarge: {
+    borderRadius: "16px",
+    background: "rgba(7,14,26,0.75)",
+    border: "1px solid rgba(255,255,255,0.06)",
+    padding: "14px",
+    marginBottom: "16px",
+    minHeight: "220px",
+  },
+  chartTitle: {
+    color: "#f6f9ff",
+    fontWeight: 700,
+    fontSize: "15px",
+    marginBottom: "12px",
   },
   chartArea: {
     position: "relative",
@@ -607,137 +650,131 @@ const styles = {
     alignItems: "flex-end",
     justifyContent: "space-between",
     gap: "8px",
-    padding: "8px 6px 0",
+    paddingTop: "18px",
     backgroundImage: "linear-gradient(to top, rgba(255,255,255,0.05) 1px, transparent 1px)",
     backgroundSize: "100% 36px",
   },
+  chartLineBarMix: {
+    height: "150px",
+    display: "flex",
+    alignItems: "flex-end",
+    gap: "6px",
+    backgroundImage: "linear-gradient(to top, rgba(255,255,255,0.05) 1px, transparent 1px)",
+    backgroundSize: "100% 30px",
+  },
   chartColumnWrap: {
-    position: "relative",
-    zIndex: 2,
+    flex: 1,
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "flex-end",
-    flex: 1,
+    zIndex: 2,
     height: "100%",
   },
   chartBar: {
-    width: "22px",
-    borderRadius: "10px 10px 0 0",
-    background: "linear-gradient(180deg, rgba(75,227,164,0.95) 0%, rgba(39,153,108,0.95) 100%)",
-    boxShadow: "0 10px 20px rgba(15,161,101,0.22)",
+    width: "20px",
+    borderRadius: "8px 8px 0 0",
+    background: "linear-gradient(180deg, #63e39b 0%, #2e9f67 100%)",
+    boxShadow: "0 10px 20px rgba(40,170,110,0.2)",
+  },
+  miniBlueBar: {
+    height: "6px",
+    borderRadius: "999px",
+    background: "linear-gradient(90deg, #2d84ff 0%, #4ba7ff 100%)",
   },
   chartDay: {
     marginTop: "8px",
-    fontSize: "11px",
-    color: "#90a5c6",
+    color: "#8ea5c9",
+    fontSize: "10px",
   },
-  lineSvg: {
+  chartSvg: {
     position: "absolute",
     inset: 0,
     width: "100%",
     height: "100%",
-    zIndex: 1,
-    overflow: "visible",
     pointerEvents: "none",
+    zIndex: 1,
   },
-  bottomSummary: {
+  historyList: {
     display: "grid",
-    gridTemplateColumns: "repeat(2, 1fr)",
-    gap: "12px",
+    gap: "8px",
+    marginBottom: "16px",
   },
-  summaryTile: {
-    borderRadius: "18px",
-    padding: "14px",
-    background: "rgba(255,255,255,0.04)",
-    border: "1px solid rgba(255,255,255,0.07)",
-    display: "flex",
-    flexDirection: "column",
-    gap: "6px",
-  },
-  summaryValue: {
-    color: "#ffffff",
-    fontSize: "19px",
-    lineHeight: 1.1,
-  },
-  summaryMini: {
-    color: "#88a1c3",
-    fontSize: "11px",
-  },
-  listWrap: {
-    display: "grid",
-    gap: "10px",
-    marginTop: "8px",
-  },
-  listItem: {
+  historyRow: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
     gap: "12px",
-    borderRadius: "16px",
-    padding: "14px",
-    background: "rgba(255,255,255,0.04)",
-    border: "1px solid rgba(255,255,255,0.06)",
+    padding: "12px 10px",
+    borderRadius: "10px",
+    background: "rgba(255,255,255,0.03)",
+    border: "1px solid rgba(255,255,255,0.05)",
   },
-  listDate: {
-    color: "#ffffff",
-    fontSize: "14px",
+  historyLeft: {
+    minWidth: 0,
   },
-  listMeta: {
-    marginTop: "4px",
-    color: "#8ca3c6",
+  historyDate: {
+    color: "#f6f8ff",
+    fontSize: "12px",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+  },
+  historyRight: {
+    color: "#c5d6f5",
+    fontWeight: 700,
     fontSize: "12px",
   },
-  listKm: {
-    color: "#c6d8f7",
-    fontWeight: 700,
-    fontSize: "13px",
-  },
-  topDuo: {
+  bottomMetricGrid2: {
     display: "grid",
     gridTemplateColumns: "repeat(2, 1fr)",
-    gap: "12px",
-    marginBottom: "16px",
+    gap: "10px",
+  },
+  bottomMetricCard: {
+    borderRadius: "14px",
+    padding: "12px",
+    background: "rgba(255,255,255,0.04)",
+    border: "1px solid rgba(255,255,255,0.07)",
+  },
+  bottomMetricValue: {
+    color: "#ffffff",
+    fontSize: "16px",
+    fontWeight: 700,
+    marginTop: "4px",
   },
   bottomNav: {
-    position: "sticky",
-    bottom: 0,
+    marginTop: "14px",
     display: "grid",
     gridTemplateColumns: "repeat(4, 1fr)",
     gap: "8px",
-    marginTop: "18px",
-    padding: "12px",
-    borderRadius: "20px",
-    background: "rgba(6,13,24,0.95)",
-    border: "1px solid rgba(255,255,255,0.08)",
-    backdropFilter: "blur(14px)",
+    borderRadius: "16px",
+    padding: "10px",
+    background: "rgba(5,11,20,0.92)",
+    border: "1px solid rgba(255,255,255,0.07)",
   },
   navBtn: {
-    border: "1px solid rgba(255,255,255,0.05)",
-    background: "rgba(255,255,255,0.03)",
-    color: "#88a0c2",
-    borderRadius: "14px",
-    padding: "12px 8px",
-    fontSize: "12px",
+    border: 0,
+    borderRadius: "10px",
+    padding: "10px 6px",
+    background: "transparent",
+    color: "#8ea4c9",
+    fontSize: "11px",
     cursor: "pointer",
   },
-  navBtnActive: {
-    border: "1px solid rgba(77,163,255,0.25)",
-    background: "linear-gradient(180deg, rgba(34,75,145,0.95) 0%, rgba(20,46,90,0.95) 100%)",
+  navActive: {
+    border: 0,
+    borderRadius: "10px",
+    padding: "10px 6px",
+    background: "linear-gradient(180deg, rgba(36,77,145,0.95) 0%, rgba(17,44,88,0.95) 100%)",
     color: "#ffffff",
-    borderRadius: "14px",
-    padding: "12px 8px",
-    fontSize: "12px",
+    fontSize: "11px",
     cursor: "pointer",
-    boxShadow: "inset 0 -2px 0 rgba(77,163,255,0.45)",
   },
 };
 
 const css = `
   * { box-sizing: border-box; }
   body { margin: 0; }
-  input::placeholder { color: #7488ab; }
-  @media (max-width: 480px) {
-    .hide-mobile { display: none; }
-  }
+  input::placeholder { color: #7d93b8; }
+  select { appearance: none; }
 `;
