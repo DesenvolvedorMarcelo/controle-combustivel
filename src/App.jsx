@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 
-const STORAGE_KEY = "fuel-tracker-pwa-v3";
+const STORAGE_KEY = "fuel-tracker-pwa-v4";
 const USERS_KEY = "fuel-tracker-users-v1";
 
 const vehicleInitial = {
-  placa: "ABC1D23",
-  modelo: "Fiat Uno 1.0",
-  ano: "2018",
+  placa: "",
+  modelo: "",
+  ano: "",
   combustivel: "Gasolina",
-  mediaCidade: "12",
-  potencia: "75 cv",
+  mediaCidade: "",
+  potencia: "",
 };
 
 const abastecimentoInicial = {
@@ -24,6 +24,12 @@ const cadastroInicial = {
   email: "",
   senha: "",
   confirmarSenha: "",
+};
+
+const redefinirInicial = {
+  email: "",
+  novaSenha: "",
+  confirmarNovaSenha: "",
 };
 
 function moeda(valor) {
@@ -46,7 +52,7 @@ function dataLabel(data) {
   return `${dia}/${mes}/${ano}`;
 }
 
-function TelaLogin({ login, setLogin, entrar, irCadastro }) {
+function TelaLogin({ login, setLogin, entrar, irCadastro, irEsqueciSenha }) {
   return (
     <section style={styles.screenCard}>
       <div style={styles.logoWrap}>
@@ -70,7 +76,9 @@ function TelaLogin({ login, setLogin, entrar, irCadastro }) {
           onChange={(e) => setLogin((prev) => ({ ...prev, senha: e.target.value }))}
         />
 
-        <div style={styles.smallLink}>Esqueceu a senha ?</div>
+        <button type="button" style={styles.smallLinkButton} onClick={irEsqueciSenha}>
+          Esqueceu a senha ?
+        </button>
 
         <button type="button" style={styles.primaryButton} onClick={entrar}>
           Entrar
@@ -93,71 +101,146 @@ function TelaCadastroUsuario({
   return (
     <section style={styles.screenCard}>
       <div style={styles.headerRow}>
-        <span style={styles.backArrow}>‹</span>
+        <button type="button" style={styles.iconBackButton} onClick={voltarLogin}>
+          ‹
+        </button>
         <h2 style={styles.headerTitle}>Cadastro de Usuário</h2>
       </div>
 
-      <div style={styles.formStack}>
-        <div>
-          <label style={styles.label}>Nome:</label>
-          <input
-            style={styles.input}
-            placeholder="Seu nome"
-            value={cadastro.nome}
-            onChange={(e) =>
-              setCadastro((prev) => ({ ...prev, nome: e.target.value }))
-            }
-          />
-        </div>
+      <div style={styles.scrollArea}>
+        <div style={styles.formStack}>
+          <div>
+            <label style={styles.label}>Nome:</label>
+            <input
+              style={styles.input}
+              placeholder="Seu nome"
+              value={cadastro.nome}
+              onChange={(e) =>
+                setCadastro((prev) => ({ ...prev, nome: e.target.value }))
+              }
+            />
+          </div>
 
-        <div>
-          <label style={styles.label}>E-mail:</label>
-          <input
-            style={styles.input}
-            placeholder="seuemail@exemplo.com"
-            value={cadastro.email}
-            onChange={(e) =>
-              setCadastro((prev) => ({ ...prev, email: e.target.value }))
-            }
-          />
-        </div>
+          <div>
+            <label style={styles.label}>E-mail:</label>
+            <input
+              style={styles.input}
+              placeholder="seuemail@exemplo.com"
+              value={cadastro.email}
+              onChange={(e) =>
+                setCadastro((prev) => ({ ...prev, email: e.target.value }))
+              }
+            />
+          </div>
 
-        <div>
-          <label style={styles.label}>Senha:</label>
-          <input
-            style={styles.input}
-            type="password"
-            placeholder="Digite uma senha"
-            value={cadastro.senha}
-            onChange={(e) =>
-              setCadastro((prev) => ({ ...prev, senha: e.target.value }))
-            }
-          />
-        </div>
+          <div>
+            <label style={styles.label}>Senha:</label>
+            <input
+              style={styles.input}
+              type="password"
+              placeholder="Digite uma senha"
+              value={cadastro.senha}
+              onChange={(e) =>
+                setCadastro((prev) => ({ ...prev, senha: e.target.value }))
+              }
+            />
+          </div>
 
-        <div>
-          <label style={styles.label}>Confirmar senha:</label>
-          <input
-            style={styles.input}
-            type="password"
-            placeholder="Repita a senha"
-            value={cadastro.confirmarSenha}
-            onChange={(e) =>
-              setCadastro((prev) => ({
-                ...prev,
-                confirmarSenha: e.target.value,
-              }))
-            }
-          />
-        </div>
+          <div>
+            <label style={styles.label}>Confirmar senha:</label>
+            <input
+              style={styles.input}
+              type="password"
+              placeholder="Repita a senha"
+              value={cadastro.confirmarSenha}
+              onChange={(e) =>
+                setCadastro((prev) => ({
+                  ...prev,
+                  confirmarSenha: e.target.value,
+                }))
+              }
+            />
+          </div>
 
-        <button type="button" style={styles.primaryButton} onClick={cadastrarUsuario}>
-          Cadastrar usuário
+          <button type="button" style={styles.primaryButton} onClick={cadastrarUsuario}>
+            Cadastrar usuário
+          </button>
+
+          <button type="button" style={styles.secondaryButton} onClick={voltarLogin}>
+            Voltar para login
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TelaEsqueciSenha({
+  redefinirSenha,
+  setRedefinirSenha,
+  salvarNovaSenha,
+  voltarLogin,
+}) {
+  return (
+    <section style={styles.screenCard}>
+      <div style={styles.headerRow}>
+        <button type="button" style={styles.iconBackButton} onClick={voltarLogin}>
+          ‹
         </button>
+        <h2 style={styles.headerTitle}>Redefinir Senha</h2>
+      </div>
 
-        <button type="button" style={styles.secondaryButton} onClick={voltarLogin}>
-          Voltar para login
-        </button>
+      <div style={styles.scrollArea}>
+        <div style={styles.formStack}>
+          <div>
+            <label style={styles.label}>E-mail:</label>
+            <input
+              style={styles.input}
+              placeholder="Digite seu e-mail"
+              value={redefinirSenha.email}
+              onChange={(e) =>
+                setRedefinirSenha((prev) => ({ ...prev, email: e.target.value }))
+              }
+            />
+          </div>
+
+          <div>
+            <label style={styles.label}>Nova senha:</label>
+            <input
+              style={styles.input}
+              type="password"
+              placeholder="Digite a nova senha"
+              value={redefinirSenha.novaSenha}
+              onChange={(e) =>
+                setRedefinirSenha((prev) => ({ ...prev, novaSenha: e.target.value }))
+              }
+            />
+          </div>
+
+          <div>
+            <label style={styles.label}>Confirmar nova senha:</label>
+            <input
+              style={styles.input}
+              type="password"
+              placeholder="Repita a nova senha"
+              value={redefinirSenha.confirmarNovaSenha}
+              onChange={(e) =>
+                setRedefinirSenha((prev) => ({
+                  ...prev,
+                  confirmarNovaSenha: e.target.value,
+                }))
+              }
+            />
+          </div>
+
+          <button type="button" style={styles.primaryButton} onClick={salvarNovaSenha}>
+            Salvar nova senha
+          </button>
+
+          <button type="button" style={styles.secondaryButton} onClick={voltarLogin}>
+            Voltar para login
+          </button>
+        </div>
       </div>
     </section>
   );
@@ -171,80 +254,82 @@ function TelaVeiculo({ vehicle, setVehicle, salvarVeiculo }) {
         <h2 style={styles.headerTitle}>Cadastro do Veículo</h2>
       </div>
 
-      <div style={styles.formStack}>
-        <div>
-          <label style={styles.label}>Placa:</label>
-          <input
-            style={styles.input}
-            value={vehicle.placa}
-            onChange={(e) =>
-              setVehicle((prev) => ({ ...prev, placa: e.target.value }))
-            }
-          />
-        </div>
+      <div style={styles.scrollArea}>
+        <div style={styles.formStack}>
+          <div>
+            <label style={styles.label}>Placa:</label>
+            <input
+              style={styles.input}
+              value={vehicle.placa}
+              onChange={(e) =>
+                setVehicle((prev) => ({ ...prev, placa: e.target.value }))
+              }
+            />
+          </div>
 
-        <div>
-          <label style={styles.label}>Modelo:</label>
-          <input
-            style={styles.input}
-            value={vehicle.modelo}
-            onChange={(e) =>
-              setVehicle((prev) => ({ ...prev, modelo: e.target.value }))
-            }
-          />
-        </div>
+          <div>
+            <label style={styles.label}>Modelo:</label>
+            <input
+              style={styles.input}
+              value={vehicle.modelo}
+              onChange={(e) =>
+                setVehicle((prev) => ({ ...prev, modelo: e.target.value }))
+              }
+            />
+          </div>
 
-        <div>
-          <label style={styles.label}>Ano:</label>
-          <input
-            style={styles.input}
-            value={vehicle.ano}
-            onChange={(e) =>
-              setVehicle((prev) => ({ ...prev, ano: e.target.value }))
-            }
-          />
-        </div>
+          <div>
+            <label style={styles.label}>Ano:</label>
+            <input
+              style={styles.input}
+              value={vehicle.ano}
+              onChange={(e) =>
+                setVehicle((prev) => ({ ...prev, ano: e.target.value }))
+              }
+            />
+          </div>
 
-        <div>
-          <label style={styles.label}>Combustível:</label>
-          <select
-            style={styles.input}
-            value={vehicle.combustivel}
-            onChange={(e) =>
-              setVehicle((prev) => ({ ...prev, combustivel: e.target.value }))
-            }
-          >
-            <option>Gasolina</option>
-            <option>Etanol</option>
-            <option>Flex</option>
-          </select>
-        </div>
+          <div>
+            <label style={styles.label}>Combustível:</label>
+            <select
+              style={styles.input}
+              value={vehicle.combustivel}
+              onChange={(e) =>
+                setVehicle((prev) => ({ ...prev, combustivel: e.target.value }))
+              }
+            >
+              <option>Gasolina</option>
+              <option>Etanol</option>
+              <option>Flex</option>
+            </select>
+          </div>
 
-        <div>
-          <label style={styles.label}>Média Cidade (km/L):</label>
-          <input
-            style={styles.input}
-            value={vehicle.mediaCidade}
-            onChange={(e) =>
-              setVehicle((prev) => ({ ...prev, mediaCidade: e.target.value }))
-            }
-          />
-        </div>
+          <div>
+            <label style={styles.label}>Média Cidade (km/L):</label>
+            <input
+              style={styles.input}
+              value={vehicle.mediaCidade}
+              onChange={(e) =>
+                setVehicle((prev) => ({ ...prev, mediaCidade: e.target.value }))
+              }
+            />
+          </div>
 
-        <div>
-          <label style={styles.label}>Potência:</label>
-          <input
-            style={styles.input}
-            value={vehicle.potencia}
-            onChange={(e) =>
-              setVehicle((prev) => ({ ...prev, potencia: e.target.value }))
-            }
-          />
-        </div>
+          <div>
+            <label style={styles.label}>Potência:</label>
+            <input
+              style={styles.input}
+              value={vehicle.potencia}
+              onChange={(e) =>
+                setVehicle((prev) => ({ ...prev, potencia: e.target.value }))
+              }
+            />
+          </div>
 
-        <button type="button" style={styles.primaryButton} onClick={salvarVeiculo}>
-          Salvar
-        </button>
+          <button type="button" style={styles.primaryButton} onClick={salvarVeiculo}>
+            Salvar
+          </button>
+        </div>
       </div>
     </section>
   );
@@ -265,74 +350,76 @@ function TelaAbastecimento({
         <h2 style={styles.headerTitle}>Registro de Abastecimento</h2>
       </div>
 
-      <div style={styles.topMetricGrid3}>
-        <div style={styles.metricCardGreen}>
-          <div style={styles.metricLabel}>KM Rodados</div>
-          <div style={styles.metricValueSmall}>{Math.round(semanaKm)} km</div>
+      <div style={styles.scrollArea}>
+        <div style={styles.topMetricGrid3}>
+          <div style={styles.metricCardGreen}>
+            <div style={styles.metricLabel}>KM Rodados</div>
+            <div style={styles.metricValueSmall}>{Math.round(semanaKm)} km</div>
+          </div>
+
+          <div style={styles.metricCardBlue}>
+            <div style={styles.metricLabel}>Consumo Médio</div>
+            <div style={styles.metricValueSmall}>{numero(resumo.consumoMedio)} km/L</div>
+          </div>
+
+          <div style={styles.metricCardBlue}>
+            <div style={styles.metricLabel}>Custo por</div>
+            <div style={styles.metricValueSmall}>{moeda(resumo.custoPorKm)}</div>
+          </div>
         </div>
 
-        <div style={styles.metricCardBlue}>
-          <div style={styles.metricLabel}>Consumo Médio</div>
-          <div style={styles.metricValueSmall}>{numero(resumo.consumoMedio)} km/L</div>
-        </div>
+        <div style={styles.historyList}>
+          {enriquecido
+            .slice()
+            .reverse()
+            .map((item) => (
+              <div key={item.id} style={styles.historyRow}>
+                <div style={styles.historyLeft}>
+                  <div style={styles.historyDate}>
+                    {dataLabel(item.data)} · {numero(item.litros)} L · {moeda(item.valor)}
+                  </div>
+                </div>
 
-        <div style={styles.metricCardBlue}>
-          <div style={styles.metricLabel}>Custo por</div>
-          <div style={styles.metricValueSmall}>{moeda(resumo.custoPorKm)}</div>
-        </div>
-      </div>
-
-      <div style={styles.historyList}>
-        {enriquecido
-          .slice()
-          .reverse()
-          .map((item) => (
-            <div key={item.id} style={styles.historyRow}>
-              <div style={styles.historyLeft}>
-                <div style={styles.historyDate}>
-                  {dataLabel(item.data)} · {numero(item.litros)} L · {moeda(item.valor)}
+                <div style={styles.historyRight}>
+                  {item.kmRodados > 0 ? `${Math.round(item.kmRodados)} km` : `${item.kmAtual} km`}
                 </div>
               </div>
+            ))}
+        </div>
 
-              <div style={styles.historyRight}>
-                {item.kmRodados > 0 ? `${Math.round(item.kmRodados)} km` : `${item.kmAtual} km`}
-              </div>
-            </div>
-          ))}
-      </div>
+        <div style={styles.formStackCompact}>
+          <input
+            style={styles.input}
+            type="date"
+            value={form.data}
+            onChange={(e) => setForm((prev) => ({ ...prev, data: e.target.value }))}
+          />
 
-      <div style={styles.formStackCompact}>
-        <input
-          style={styles.input}
-          type="date"
-          value={form.data}
-          onChange={(e) => setForm((prev) => ({ ...prev, data: e.target.value }))}
-        />
+          <input
+            style={styles.input}
+            placeholder="KM Atual"
+            value={form.kmAtual}
+            onChange={(e) => setForm((prev) => ({ ...prev, kmAtual: e.target.value }))}
+          />
 
-        <input
-          style={styles.input}
-          placeholder="KM Atual"
-          value={form.kmAtual}
-          onChange={(e) => setForm((prev) => ({ ...prev, kmAtual: e.target.value }))}
-        />
+          <input
+            style={styles.input}
+            placeholder="Litros"
+            value={form.litros}
+            onChange={(e) => setForm((prev) => ({ ...prev, litros: e.target.value }))}
+          />
 
-        <input
-          style={styles.input}
-          placeholder="Litros"
-          value={form.litros}
-          onChange={(e) => setForm((prev) => ({ ...prev, litros: e.target.value }))}
-        />
+          <input
+            style={styles.input}
+            placeholder="Valor"
+            value={form.valor}
+            onChange={(e) => setForm((prev) => ({ ...prev, valor: e.target.value }))}
+          />
 
-        <input
-          style={styles.input}
-          placeholder="Valor"
-          value={form.valor}
-          onChange={(e) => setForm((prev) => ({ ...prev, valor: e.target.value }))}
-        />
-
-        <button type="button" style={styles.primaryButton} onClick={adicionarAbastecimento}>
-          + Adicionar Abastecimento
-        </button>
+          <button type="button" style={styles.primaryButton} onClick={adicionarAbastecimento}>
+            + Adicionar Abastecimento
+          </button>
+        </div>
       </div>
     </section>
   );
@@ -346,60 +433,62 @@ function TelaAnalise({ semanaValor, semanaKm, resumo, grafico }) {
         <h2 style={styles.headerTitle}>Análise de Consumo</h2>
       </div>
 
-      <div style={styles.topMetricGrid2}>
-        <div style={styles.metricCardGreen}>
-          <div style={styles.metricLabel}>Esta Semana</div>
-          <div style={styles.metricValueBig}>{moeda(semanaValor)}</div>
-          <div style={styles.metricSub}>{Math.round(semanaKm)} km</div>
+      <div style={styles.scrollArea}>
+        <div style={styles.topMetricGrid2}>
+          <div style={styles.metricCardGreen}>
+            <div style={styles.metricLabel}>Esta Semana</div>
+            <div style={styles.metricValueBig}>{moeda(semanaValor)}</div>
+            <div style={styles.metricSub}>{Math.round(semanaKm)} km</div>
+          </div>
+
+          <div style={styles.metricCardBlue}>
+            <div style={styles.metricLabel}>Este Mês</div>
+            <div style={styles.metricValueBig}>{moeda(resumo.totalValor)}</div>
+            <div style={styles.metricSub}>{Math.round(resumo.totalKm)} km</div>
+          </div>
         </div>
 
-        <div style={styles.metricCardBlue}>
-          <div style={styles.metricLabel}>Este Mês</div>
-          <div style={styles.metricValueBig}>{moeda(resumo.totalValor)}</div>
-          <div style={styles.metricSub}>{Math.round(resumo.totalKm)} km</div>
-        </div>
-      </div>
+        <div style={styles.chartCard}>
+          <div style={styles.chartTitle}>Desempenho de Consumo</div>
 
-      <div style={styles.chartCard}>
-        <div style={styles.chartTitle}>Desempenho de Consumo</div>
-
-        <div style={styles.chartArea}>
-          {grafico.map((valor, index) => (
-            <div key={index} style={styles.chartColumnWrap}>
-              <div
-                style={{
-                  ...styles.chartBar,
-                  height: `${Math.max(24, valor * 10)}px`,
-                }}
-              />
-              <div style={styles.chartDay}>
-                {["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"][index] || `#${index + 1}`}
+          <div style={styles.chartArea}>
+            {grafico.map((valor, index) => (
+              <div key={index} style={styles.chartColumnWrap}>
+                <div
+                  style={{
+                    ...styles.chartBar,
+                    height: `${Math.max(24, valor * 10)}px`,
+                  }}
+                />
+                <div style={styles.chartDay}>
+                  {["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"][index] || `#${index + 1}`}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
 
-          <svg style={styles.chartSvg} viewBox="0 0 320 150" preserveAspectRatio="none">
-            <polyline
-              fill="none"
-              stroke="#42a5ff"
-              strokeWidth="3"
-              points={grafico
-                .map((valor, index) => `${24 + index * 54},${132 - valor * 8}`)
-                .join(" ")}
-            />
-          </svg>
-        </div>
-      </div>
-
-      <div style={styles.bottomMetricGrid2}>
-        <div style={styles.bottomMetricCard}>
-          <div style={styles.metricLabel}>Média Semanal</div>
-          <div style={styles.bottomMetricValue}>{numero(resumo.consumoMedio)} km/L</div>
+            <svg style={styles.chartSvg} viewBox="0 0 320 150" preserveAspectRatio="none">
+              <polyline
+                fill="none"
+                stroke="#42a5ff"
+                strokeWidth="3"
+                points={grafico
+                  .map((valor, index) => `${24 + index * 54},${132 - valor * 8}`)
+                  .join(" ")}
+              />
+            </svg>
+          </div>
         </div>
 
-        <div style={styles.bottomMetricCard}>
-          <div style={styles.metricLabel}>Custo Semanal</div>
-          <div style={styles.bottomMetricValue}>{moeda(semanaValor)}</div>
+        <div style={styles.bottomMetricGrid2}>
+          <div style={styles.bottomMetricCard}>
+            <div style={styles.metricLabel}>Média Semanal</div>
+            <div style={styles.bottomMetricValue}>{numero(resumo.consumoMedio)} km/L</div>
+          </div>
+
+          <div style={styles.bottomMetricCard}>
+            <div style={styles.metricLabel}>Custo Semanal</div>
+            <div style={styles.bottomMetricValue}>{moeda(semanaValor)}</div>
+          </div>
         </div>
       </div>
     </section>
@@ -414,52 +503,54 @@ function TelaInicio({ usuarioAtual, resumo, grafico, ultimo }) {
         {usuarioAtual ? `Usuário: ${usuarioAtual.nome}` : "Visual escuro e responsivo"}
       </div>
 
-      <div style={styles.topMetricGrid4}>
-        <div style={styles.metricCardBlue}>
-          <div style={styles.metricLabel}>Gastos da Vida</div>
-          <div style={styles.metricValueBig}>{moeda(resumo.totalValor)}</div>
+      <div style={styles.scrollArea}>
+        <div style={styles.topMetricGrid4}>
+          <div style={styles.metricCardBlue}>
+            <div style={styles.metricLabel}>Gastos da Vida</div>
+            <div style={styles.metricValueBig}>{moeda(resumo.totalValor)}</div>
+          </div>
+
+          <div style={styles.metricCardBlue}>
+            <div style={styles.metricLabel}>KM Rodados</div>
+            <div style={styles.metricValueBig}>{Math.round(resumo.totalKm)} km</div>
+          </div>
+
+          <div style={styles.metricCardBlue}>
+            <div style={styles.metricLabel}>Consumo Médio</div>
+            <div style={styles.metricValueBig}>{numero(resumo.consumoMedio)} km/L</div>
+          </div>
+
+          <div style={styles.metricCardBlue}>
+            <div style={styles.metricLabel}>Economia</div>
+            <div style={styles.metricValueBig}>82%</div>
+          </div>
         </div>
 
-        <div style={styles.metricCardBlue}>
-          <div style={styles.metricLabel}>KM Rodados</div>
-          <div style={styles.metricValueBig}>{Math.round(resumo.totalKm)} km</div>
-        </div>
-
-        <div style={styles.metricCardBlue}>
-          <div style={styles.metricLabel}>Consumo Médio</div>
-          <div style={styles.metricValueBig}>{numero(resumo.consumoMedio)} km/L</div>
-        </div>
-
-        <div style={styles.metricCardBlue}>
-          <div style={styles.metricLabel}>Economia</div>
-          <div style={styles.metricValueBig}>82%</div>
-        </div>
-      </div>
-
-      <div style={styles.chartCardLarge}>
-        <div style={styles.chartTitle}>Desempenho Semanal</div>
-        <div style={styles.chartLineBarMix}>
-          {grafico.map((valor, index) => (
-            <div key={index} style={styles.chartColumnWrap}>
-              <div style={{ ...styles.miniBlueBar, width: "100%" }} />
-              <div style={styles.chartDay}>
-                {["SEG", "TER", "QUA", "QUI", "SEX", "SAB"][index] || `#${index + 1}`}
+        <div style={styles.chartCardLarge}>
+          <div style={styles.chartTitle}>Desempenho Semanal</div>
+          <div style={styles.chartLineBarMix}>
+            {grafico.map((valor, index) => (
+              <div key={index} style={styles.chartColumnWrap}>
+                <div style={{ ...styles.miniBlueBar, width: "100%" }} />
+                <div style={styles.chartDay}>
+                  {["SEG", "TER", "QUA", "QUI", "SEX", "SAB"][index] || `#${index + 1}`}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div style={styles.bottomMetricGrid2}>
-        <div style={styles.bottomMetricCard}>
-          <div style={styles.metricLabel}>Último Abastecimento</div>
-          <div style={styles.bottomMetricValue}>{ultimo ? `${Math.round(ultimo.litros)} L` : "--"}</div>
-          <div style={styles.metricSub}>{ultimo ? dataLabel(ultimo.data) : "sem dados"}</div>
+            ))}
+          </div>
         </div>
 
-        <div style={styles.bottomMetricCard}>
-          <div style={styles.metricLabel}>Custo por KM</div>
-          <div style={styles.bottomMetricValue}>{moeda(resumo.custoPorKm)}</div>
+        <div style={styles.bottomMetricGrid2}>
+          <div style={styles.bottomMetricCard}>
+            <div style={styles.metricLabel}>Último Abastecimento</div>
+            <div style={styles.bottomMetricValue}>{ultimo ? `${Math.round(ultimo.litros)} L` : "--"}</div>
+            <div style={styles.metricSub}>{ultimo ? dataLabel(ultimo.data) : "sem dados"}</div>
+          </div>
+
+          <div style={styles.bottomMetricCard}>
+            <div style={styles.metricLabel}>Custo por KM</div>
+            <div style={styles.bottomMetricValue}>{moeda(resumo.custoPorKm)}</div>
+          </div>
         </div>
       </div>
     </section>
@@ -470,6 +561,7 @@ export default function App() {
   const [aba, setAba] = useState("login");
   const [login, setLogin] = useState({ email: "", senha: "" });
   const [cadastro, setCadastro] = useState(cadastroInicial);
+  const [redefinirSenha, setRedefinirSenha] = useState(redefinirInicial);
   const [usuarioAtual, setUsuarioAtual] = useState(null);
   const [vehicle, setVehicle] = useState(vehicleInitial);
   const [form, setForm] = useState(abastecimentoInicial);
@@ -650,6 +742,48 @@ export default function App() {
     setMensagem("Usuário cadastrado com sucesso. Agora entre com seu login.");
   }
 
+  function salvarNovaSenha() {
+    if (
+      !redefinirSenha.email ||
+      !redefinirSenha.novaSenha ||
+      !redefinirSenha.confirmarNovaSenha
+    ) {
+      setMensagem("Preencha todos os campos para redefinir a senha.");
+      return;
+    }
+
+    if (redefinirSenha.novaSenha !== redefinirSenha.confirmarNovaSenha) {
+      setMensagem("As novas senhas não conferem.");
+      return;
+    }
+
+    const usuarios = obterUsuarios();
+    const indiceUsuario = usuarios.findIndex(
+      (item) =>
+        item.email.trim().toLowerCase() === redefinirSenha.email.trim().toLowerCase()
+    );
+
+    if (indiceUsuario === -1) {
+      setMensagem("E-mail não encontrado.");
+      return;
+    }
+
+    usuarios[indiceUsuario] = {
+      ...usuarios[indiceUsuario],
+      senha: redefinirSenha.novaSenha,
+    };
+
+    salvarUsuarios(usuarios);
+
+    setLogin({
+      email: redefinirSenha.email,
+      senha: redefinirSenha.novaSenha,
+    });
+    setRedefinirSenha(redefinirInicial);
+    setAba("login");
+    setMensagem("Senha atualizada com sucesso.");
+  }
+
   function sair() {
     setUsuarioAtual(null);
     setLogin({ email: "", senha: "" });
@@ -658,7 +792,7 @@ export default function App() {
   }
 
   function salvarVeiculo() {
-    setMensagem("Veículo salvo com sucesso.");
+    setMensagem("Veículo salvo com sucesso no app.");
     setAba("veiculo");
   }
 
@@ -692,6 +826,7 @@ export default function App() {
     setHistorico([]);
     setLogin({ email: "", senha: "" });
     setCadastro(cadastroInicial);
+    setRedefinirSenha(redefinirInicial);
     setUsuarioAtual(null);
     setForm(abastecimentoInicial);
     setAba("login");
@@ -723,6 +858,7 @@ export default function App() {
               setLogin={setLogin}
               entrar={entrar}
               irCadastro={() => setAba("cadastro-usuario")}
+              irEsqueciSenha={() => setAba("esqueci-senha")}
             />
           )}
 
@@ -731,6 +867,15 @@ export default function App() {
               cadastro={cadastro}
               setCadastro={setCadastro}
               cadastrarUsuario={cadastrarUsuario}
+              voltarLogin={() => setAba("login")}
+            />
+          )}
+
+          {aba === "esqueci-senha" && (
+            <TelaEsqueciSenha
+              redefinirSenha={redefinirSenha}
+              setRedefinirSenha={setRedefinirSenha}
+              salvarNovaSenha={salvarNovaSenha}
               voltarLogin={() => setAba("login")}
             />
           )}
@@ -772,7 +917,7 @@ export default function App() {
             />
           )}
 
-          {aba !== "login" && aba !== "cadastro-usuario" && (
+          {aba !== "login" && aba !== "cadastro-usuario" && aba !== "esqueci-senha" && (
             <>
               <div style={styles.actionsRow}>
                 <button style={styles.secondaryButton} onClick={instalarApp}>
@@ -830,7 +975,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    padding: "20px",
+    padding: "12px",
     fontFamily: "Inter, Arial, sans-serif",
   },
   mobileShell: {
@@ -838,46 +983,59 @@ const styles = {
     maxWidth: "390px",
   },
   mobileFrame: {
-    minHeight: "820px",
-    borderRadius: "34px",
+    height: "100dvh",
+    maxHeight: "860px",
+    borderRadius: "30px",
     background: "linear-gradient(180deg, #08111f 0%, #0a1630 100%)",
     border: "1px solid rgba(255,255,255,0.08)",
     boxShadow: "0 24px 80px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04)",
     overflow: "hidden",
-    padding: "18px",
+    padding: "14px",
     position: "relative",
+    display: "flex",
+    flexDirection: "column",
   },
   screenCard: {
-    borderRadius: "22px",
+    borderRadius: "20px",
     background: "linear-gradient(180deg, rgba(15,28,52,0.98) 0%, rgba(10,19,35,0.98) 100%)",
     border: "1px solid rgba(255,255,255,0.06)",
-    padding: "18px",
-    minHeight: "680px",
+    padding: "14px",
+    flex: 1,
+    minHeight: 0,
+    display: "flex",
+    flexDirection: "column",
+    overflow: "hidden",
+  },
+  scrollArea: {
+    flex: 1,
+    overflowY: "auto",
+    paddingRight: "2px",
+    paddingBottom: "14px",
   },
   logoWrap: {
     display: "flex",
     alignItems: "center",
     gap: "10px",
-    marginBottom: "42px",
-    marginTop: "8px",
+    marginBottom: "26px",
+    marginTop: "6px",
   },
   logoIcon: {
-    fontSize: "30px",
+    fontSize: "28px",
   },
   logoText: {
     color: "#f2f6ff",
-    fontSize: "16px",
+    fontSize: "18px",
     fontWeight: 700,
   },
   formStack: {
     display: "grid",
-    gap: "14px",
-    marginTop: "18px",
+    gap: "12px",
+    marginTop: "10px",
   },
   formStackCompact: {
     display: "grid",
     gap: "10px",
-    marginTop: "18px",
+    marginTop: "16px",
   },
   label: {
     display: "block",
@@ -897,20 +1055,25 @@ const styles = {
     fontSize: "14px",
     outline: "none",
   },
-  smallLink: {
+  smallLinkButton: {
     textAlign: "right",
     color: "#98abd0",
     fontSize: "12px",
     marginTop: "-4px",
+    background: "transparent",
+    border: 0,
+    cursor: "pointer",
+    padding: 0,
   },
   linkButton: {
-    marginTop: "120px",
+    marginTop: "auto",
     width: "100%",
     background: "transparent",
     border: 0,
     color: "#9db3da",
     fontSize: "14px",
     cursor: "pointer",
+    paddingTop: "24px",
   },
   primaryButton: {
     marginTop: "4px",
@@ -932,6 +1095,7 @@ const styles = {
     color: "#dce6fa",
     fontWeight: 600,
     cursor: "pointer",
+    fontSize: "12px",
   },
   dangerButton: {
     border: "1px solid rgba(255,120,120,0.25)",
@@ -941,12 +1105,23 @@ const styles = {
     color: "#ffd0d0",
     fontWeight: 600,
     cursor: "pointer",
+    fontSize: "12px",
   },
   headerRow: {
     display: "flex",
     alignItems: "center",
-    gap: "10px",
-    marginBottom: "18px",
+    gap: "8px",
+    marginBottom: "14px",
+    flexShrink: 0,
+  },
+  iconBackButton: {
+    background: "transparent",
+    border: 0,
+    color: "#f4f7ff",
+    fontSize: "28px",
+    lineHeight: 1,
+    cursor: "pointer",
+    padding: 0,
   },
   backArrow: {
     color: "#f4f7ff",
@@ -964,15 +1139,17 @@ const styles = {
     fontWeight: 700,
     fontSize: "22px",
     marginBottom: "4px",
+    flexShrink: 0,
   },
   screenSub: {
     color: "#8ea2c7",
     fontSize: "11px",
     marginBottom: "14px",
+    flexShrink: 0,
   },
   topMetricGrid4: {
     display: "grid",
-    gridTemplateColumns: "repeat(4, 1fr)",
+    gridTemplateColumns: "repeat(2, 1fr)",
     gap: "8px",
     marginBottom: "14px",
   },
@@ -994,6 +1171,7 @@ const styles = {
     background: "linear-gradient(180deg, rgba(20,35,62,0.98) 0%, rgba(12,24,45,0.98) 100%)",
     border: "1px solid rgba(83,162,255,0.18)",
     boxShadow: "inset 0 -3px 0 rgba(62,151,255,0.55)",
+    minWidth: 0,
   },
   metricCardGreen: {
     borderRadius: "12px",
@@ -1001,6 +1179,7 @@ const styles = {
     background: "linear-gradient(180deg, rgba(20,54,45,0.98) 0%, rgba(12,35,30,0.98) 100%)",
     border: "1px solid rgba(64,220,150,0.2)",
     boxShadow: "inset 0 -3px 0 rgba(51,224,147,0.58)",
+    minWidth: 0,
   },
   metricLabel: {
     color: "#9db0d3",
@@ -1012,12 +1191,14 @@ const styles = {
     fontWeight: 700,
     fontSize: "16px",
     lineHeight: 1.1,
+    wordBreak: "break-word",
   },
   metricValueSmall: {
     color: "#ffffff",
     fontWeight: 700,
-    fontSize: "15px",
+    fontSize: "14px",
     lineHeight: 1.15,
+    wordBreak: "break-word",
   },
   metricSub: {
     color: "#a7b9dc",
@@ -1150,6 +1331,7 @@ const styles = {
     display: "grid",
     gridTemplateColumns: "1fr 1fr 1fr",
     gap: "8px",
+    flexShrink: 0,
   },
   bottomNav: {
     marginTop: "8px",
@@ -1160,6 +1342,7 @@ const styles = {
     padding: "10px",
     background: "rgba(5,11,20,0.92)",
     border: "1px solid rgba(255,255,255,0.07)",
+    flexShrink: 0,
   },
   navBtn: {
     border: 0,
@@ -1187,12 +1370,14 @@ const styles = {
     border: "1px solid rgba(77,163,255,0.18)",
     color: "#d7e7ff",
     fontSize: "12px",
+    flexShrink: 0,
   },
 };
 
 const css = `
   * { box-sizing: border-box; }
   body { margin: 0; }
+  html, body, #root { min-height: 100%; }
   input::placeholder { color: #7d93b8; }
   select { appearance: none; }
 `;
