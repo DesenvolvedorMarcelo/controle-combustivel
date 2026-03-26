@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
-const STORAGE_KEY = "fuel-tracker-pwa-v4";
-const USERS_KEY = "fuel-tracker-users-v1";
+const STORAGE_KEY = "fuel-tracker-pwa-v5";
+const USERS_KEY = "fuel-tracker-users-v2";
 
 const vehicleInitial = {
   placa: "",
@@ -94,7 +94,7 @@ function TelaLogin({
         </div>
 
         <button type="button" style={styles.smallLinkButton} onClick={irEsqueciSenha}>
-          Esqueceu a senha ?
+          Esqueceu a senha?
         </button>
 
         <button type="button" style={styles.primaryButton} onClick={entrar}>
@@ -122,16 +122,13 @@ function TelaCadastroUsuario({
   return (
     <section style={styles.screenCard}>
       <div style={styles.headerRow}>
-        <button type="button" style={styles.iconBackButton} onClick={voltarLogin}>
-          ‹
-        </button>
         <h2 style={styles.headerTitle}>Cadastro de Usuário</h2>
       </div>
 
       <div style={styles.scrollArea}>
         <div style={styles.formStack}>
           <div>
-            <label style={styles.label}>Nome:</label>
+            <label style={styles.label}>Nome</label>
             <input
               style={styles.input}
               placeholder="Seu nome"
@@ -141,7 +138,7 @@ function TelaCadastroUsuario({
           </div>
 
           <div>
-            <label style={styles.label}>E-mail:</label>
+            <label style={styles.label}>E-mail</label>
             <input
               style={styles.input}
               placeholder="seuemail@exemplo.com"
@@ -151,7 +148,7 @@ function TelaCadastroUsuario({
           </div>
 
           <div>
-            <label style={styles.label}>Senha:</label>
+            <label style={styles.label}>Senha</label>
             <div style={styles.passwordWrap}>
               <input
                 style={styles.inputWithButton}
@@ -171,7 +168,7 @@ function TelaCadastroUsuario({
           </div>
 
           <div>
-            <label style={styles.label}>Confirmar senha:</label>
+            <label style={styles.label}>Confirmar senha</label>
             <div style={styles.passwordWrap}>
               <input
                 style={styles.inputWithButton}
@@ -221,16 +218,13 @@ function TelaEsqueciSenha({
   return (
     <section style={styles.screenCard}>
       <div style={styles.headerRow}>
-        <button type="button" style={styles.iconBackButton} onClick={voltarLogin}>
-          ‹
-        </button>
         <h2 style={styles.headerTitle}>Redefinir Senha</h2>
       </div>
 
       <div style={styles.scrollArea}>
         <div style={styles.formStack}>
           <div>
-            <label style={styles.label}>E-mail:</label>
+            <label style={styles.label}>E-mail</label>
             <input
               style={styles.input}
               placeholder="Digite seu e-mail"
@@ -242,7 +236,7 @@ function TelaEsqueciSenha({
           </div>
 
           <div>
-            <label style={styles.label}>Nova senha:</label>
+            <label style={styles.label}>Nova senha</label>
             <div style={styles.passwordWrap}>
               <input
                 style={styles.inputWithButton}
@@ -264,7 +258,7 @@ function TelaEsqueciSenha({
           </div>
 
           <div>
-            <label style={styles.label}>Confirmar nova senha:</label>
+            <label style={styles.label}>Confirmar nova senha</label>
             <div style={styles.passwordWrap}>
               <input
                 style={styles.inputWithButton}
@@ -305,14 +299,13 @@ function TelaVeiculo({ vehicle, setVehicle, salvarVeiculo }) {
   return (
     <section style={styles.screenCard}>
       <div style={styles.headerRow}>
-        <span style={styles.backArrow}>‹</span>
         <h2 style={styles.headerTitle}>Cadastro do Veículo</h2>
       </div>
 
       <div style={styles.scrollArea}>
         <div style={styles.formStack}>
           <div>
-            <label style={styles.label}>Placa:</label>
+            <label style={styles.label}>Placa</label>
             <input
               style={styles.input}
               value={vehicle.placa}
@@ -321,7 +314,7 @@ function TelaVeiculo({ vehicle, setVehicle, salvarVeiculo }) {
           </div>
 
           <div>
-            <label style={styles.label}>Modelo:</label>
+            <label style={styles.label}>Modelo</label>
             <input
               style={styles.input}
               value={vehicle.modelo}
@@ -330,7 +323,7 @@ function TelaVeiculo({ vehicle, setVehicle, salvarVeiculo }) {
           </div>
 
           <div>
-            <label style={styles.label}>Ano:</label>
+            <label style={styles.label}>Ano</label>
             <input
               style={styles.input}
               value={vehicle.ano}
@@ -339,7 +332,7 @@ function TelaVeiculo({ vehicle, setVehicle, salvarVeiculo }) {
           </div>
 
           <div>
-            <label style={styles.label}>Combustível:</label>
+            <label style={styles.label}>Combustível</label>
             <select
               style={styles.input}
               value={vehicle.combustivel}
@@ -352,7 +345,7 @@ function TelaVeiculo({ vehicle, setVehicle, salvarVeiculo }) {
           </div>
 
           <div>
-            <label style={styles.label}>Média Cidade (km/L):</label>
+            <label style={styles.label}>Média Cidade (km/L)</label>
             <input
               style={styles.input}
               value={vehicle.mediaCidade}
@@ -361,7 +354,7 @@ function TelaVeiculo({ vehicle, setVehicle, salvarVeiculo }) {
           </div>
 
           <div>
-            <label style={styles.label}>Potência:</label>
+            <label style={styles.label}>Potência</label>
             <input
               style={styles.input}
               value={vehicle.potencia}
@@ -389,7 +382,6 @@ function TelaAbastecimento({
   return (
     <section style={styles.screenCard}>
       <div style={styles.headerRow}>
-        <span style={styles.backArrow}>‹</span>
         <h2 style={styles.headerTitle}>Registro de Abastecimento</h2>
       </div>
 
@@ -472,7 +464,6 @@ function TelaAnalise({ semanaValor, semanaKm, resumo, grafico }) {
   return (
     <section style={styles.screenCard}>
       <div style={styles.headerRow}>
-        <span style={styles.backArrow}>‹</span>
         <h2 style={styles.headerTitle}>Análise de Consumo</h2>
       </div>
 
@@ -608,12 +599,7 @@ export default function App() {
   const [usuarioAtual, setUsuarioAtual] = useState(null);
   const [vehicle, setVehicle] = useState(vehicleInitial);
   const [form, setForm] = useState(abastecimentoInicial);
-  const [historico, setHistorico] = useState([
-    { id: 1, data: "2026-03-18", kmAtual: 15240, litros: 25.8, valor: 145.0 },
-    { id: 2, data: "2026-03-20", kmAtual: 15602, litros: 30.2, valor: 170.0 },
-    { id: 3, data: "2026-03-22", kmAtual: 16152, litros: 28.5, valor: 152.0 },
-  ]);
-  const [instalarEvento, setInstalarEvento] = useState(null);
+  const [historico, setHistorico] = useState([]);
   const [mensagem, setMensagem] = useState("");
 
   const [mostrarSenhaLogin, setMostrarSenhaLogin] = useState(false);
@@ -651,24 +637,6 @@ export default function App() {
     );
   }, [vehicle, historico, login, aba, usuarioAtual]);
 
-  useEffect(() => {
-    const capturarInstall = (event) => {
-      event.preventDefault();
-      setInstalarEvento(event);
-    };
-
-    window.addEventListener("beforeinstallprompt", capturarInstall);
-    return () => window.removeEventListener("beforeinstallprompt", capturarInstall);
-  }, []);
-
-  useEffect(() => {
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker
-        .register("/service-worker.js")
-        .catch((erro) => console.error("Erro ao registrar service worker:", erro));
-    }
-  }, []);
-
   const enriquecido = useMemo(() => {
     return historico.map((item, index) => {
       const anterior = historico[index - 1];
@@ -688,9 +656,9 @@ export default function App() {
   const validos = enriquecido.filter((item) => item.kmRodados > 0);
 
   const resumo = useMemo(() => {
-    const totalValor = historico.reduce((soma, item) => soma + Number(item.valor), 0);
-    const totalLitros = historico.reduce((soma, item) => soma + Number(item.litros), 0);
-    const totalKm = validos.reduce((soma, item) => soma + Number(item.kmRodados), 0);
+    const totalValor = historico.reduce((soma, item) => soma + Number(item.valor || 0), 0);
+    const totalLitros = historico.reduce((soma, item) => soma + Number(item.litros || 0), 0);
+    const totalKm = validos.reduce((soma, item) => soma + Number(item.kmRodados || 0), 0);
     const consumoMedio = totalLitros > 0 ? totalKm / totalLitros : 0;
     const custoPorKm = totalKm > 0 ? totalValor / totalKm : 0;
 
@@ -710,8 +678,8 @@ export default function App() {
   }, [validos]);
 
   const ultimo = validos[validos.length - 1];
-  const semanaValor = historico.slice(-2).reduce((soma, item) => soma + Number(item.valor), 0);
-  const semanaKm = validos.slice(-2).reduce((soma, item) => soma + Number(item.kmRodados), 0);
+  const semanaValor = historico.slice(-2).reduce((soma, item) => soma + Number(item.valor || 0), 0);
+  const semanaKm = validos.slice(-2).reduce((soma, item) => soma + Number(item.kmRodados || 0), 0);
 
   function obterUsuarios() {
     try {
@@ -835,14 +803,12 @@ export default function App() {
 
   function sair() {
     setUsuarioAtual(null);
-    setLogin({ email: "", senha: "" });
     setAba("login");
-    setMensagem("Você saiu da conta.");
+    setMensagem("Login mantido salvo para facilitar o próximo acesso.");
   }
 
   function salvarVeiculo() {
-    setMensagem("Veículo salvo com sucesso no app.");
-    setAba("veiculo");
+    setMensagem("Veículo salvo com sucesso no aplicativo.");
   }
 
   function adicionarAbastecimento() {
@@ -880,17 +846,6 @@ export default function App() {
     setForm(abastecimentoInicial);
     setAba("login");
     setMensagem("Dados apagados.");
-  }
-
-  async function instalarApp() {
-    if (!instalarEvento) {
-      setMensagem("No celular, abra no Chrome e toque em 'Adicionar à tela inicial'.");
-      return;
-    }
-
-    instalarEvento.prompt();
-    await instalarEvento.userChoice;
-    setInstalarEvento(null);
   }
 
   return (
@@ -979,9 +934,6 @@ export default function App() {
           {aba !== "login" && aba !== "cadastro-usuario" && aba !== "esqueci-senha" && (
             <>
               <div style={styles.actionsRow}>
-                <button style={styles.secondaryButton} onClick={instalarApp}>
-                  Instalar app
-                </button>
                 <button style={styles.secondaryButton} onClick={sair}>
                   Sair
                 </button>
@@ -1034,7 +986,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    padding: "12px",
+    padding: "10px",
     fontFamily: "Inter, Arial, sans-serif",
   },
   mobileShell: {
@@ -1044,21 +996,21 @@ const styles = {
   mobileFrame: {
     height: "100dvh",
     maxHeight: "860px",
-    borderRadius: "30px",
+    borderRadius: "28px",
     background: "linear-gradient(180deg, #08111f 0%, #0a1630 100%)",
     border: "1px solid rgba(255,255,255,0.08)",
     boxShadow: "0 24px 80px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04)",
     overflow: "hidden",
-    padding: "14px",
+    padding: "12px",
     position: "relative",
     display: "flex",
     flexDirection: "column",
   },
   screenCard: {
-    borderRadius: "20px",
+    borderRadius: "18px",
     background: "linear-gradient(180deg, rgba(15,28,52,0.98) 0%, rgba(10,19,35,0.98) 100%)",
     border: "1px solid rgba(255,255,255,0.06)",
-    padding: "14px",
+    padding: "12px",
     flex: 1,
     minHeight: 0,
     display: "flex",
@@ -1069,17 +1021,17 @@ const styles = {
     flex: 1,
     overflowY: "auto",
     paddingRight: "2px",
-    paddingBottom: "14px",
+    paddingBottom: "10px",
   },
   logoWrap: {
     display: "flex",
     alignItems: "center",
     gap: "10px",
-    marginBottom: "26px",
-    marginTop: "6px",
+    marginBottom: "22px",
+    marginTop: "4px",
   },
   logoIcon: {
-    fontSize: "28px",
+    fontSize: "26px",
   },
   logoText: {
     color: "#f2f6ff",
@@ -1088,64 +1040,66 @@ const styles = {
   },
   formStack: {
     display: "grid",
-    gap: "12px",
-    marginTop: "10px",
+    gap: "10px",
+    marginTop: "8px",
   },
   formStackCompact: {
     display: "grid",
-    gap: "10px",
-    marginTop: "16px",
+    gap: "8px",
+    marginTop: "12px",
   },
   label: {
     display: "block",
     color: "#d9e3f8",
-    fontSize: "13px",
-    marginBottom: "6px",
+    fontSize: "12px",
+    marginBottom: "5px",
     fontWeight: 600,
   },
   input: {
     width: "100%",
+    maxWidth: "100%",
     boxSizing: "border-box",
     borderRadius: "10px",
     border: "1px solid rgba(255,255,255,0.12)",
     background: "rgba(255,255,255,0.04)",
     color: "#f7f9fe",
-    padding: "12px 12px",
+    padding: "11px 12px",
     fontSize: "14px",
     outline: "none",
   },
   passwordWrap: {
     display: "flex",
     alignItems: "center",
-    gap: "8px",
+    gap: "6px",
   },
   inputWithButton: {
     flex: 1,
+    maxWidth: "100%",
     boxSizing: "border-box",
     borderRadius: "10px",
     border: "1px solid rgba(255,255,255,0.12)",
     background: "rgba(255,255,255,0.04)",
     color: "#f7f9fe",
-    padding: "12px 12px",
+    padding: "11px 12px",
     fontSize: "14px",
     outline: "none",
   },
   passwordToggle: {
     border: "1px solid rgba(83,162,255,0.25)",
     borderRadius: "10px",
-    padding: "12px 10px",
+    padding: "11px 8px",
     background: "rgba(255,255,255,0.03)",
     color: "#dce6fa",
     fontWeight: 600,
     cursor: "pointer",
-    minWidth: "68px",
-    fontSize: "12px",
+    minWidth: "62px",
+    fontSize: "11px",
   },
   smallLinkButton: {
     textAlign: "right",
     color: "#98abd0",
     fontSize: "12px",
-    marginTop: "-4px",
+    marginTop: "-2px",
     background: "transparent",
     border: 0,
     cursor: "pointer",
@@ -1159,24 +1113,24 @@ const styles = {
     color: "#9db3da",
     fontSize: "14px",
     cursor: "pointer",
-    paddingTop: "24px",
+    paddingTop: "18px",
   },
   primaryButton: {
-    marginTop: "4px",
+    marginTop: "2px",
     border: 0,
     borderRadius: "10px",
-    padding: "13px 16px",
+    padding: "12px 14px",
     background: "linear-gradient(180deg, #2e80f8 0%, #1359d4 100%)",
     color: "#fff",
     fontWeight: 700,
-    fontSize: "15px",
+    fontSize: "14px",
     cursor: "pointer",
     boxShadow: "0 10px 24px rgba(34,103,255,0.35)",
   },
   secondaryButton: {
     border: "1px solid rgba(83,162,255,0.25)",
     borderRadius: "10px",
-    padding: "11px 12px",
+    padding: "10px 10px",
     background: "rgba(255,255,255,0.03)",
     color: "#dce6fa",
     fontWeight: 600,
@@ -1186,7 +1140,7 @@ const styles = {
   dangerButton: {
     border: "1px solid rgba(255,120,120,0.25)",
     borderRadius: "10px",
-    padding: "11px 12px",
+    padding: "10px 10px",
     background: "rgba(255,80,80,0.06)",
     color: "#ffd0d0",
     fontWeight: 600,
@@ -1197,63 +1151,49 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "8px",
-    marginBottom: "14px",
+    marginBottom: "10px",
     flexShrink: 0,
-  },
-  iconBackButton: {
-    background: "transparent",
-    border: 0,
-    color: "#f4f7ff",
-    fontSize: "28px",
-    lineHeight: 1,
-    cursor: "pointer",
-    padding: 0,
-  },
-  backArrow: {
-    color: "#f4f7ff",
-    fontSize: "28px",
-    lineHeight: 1,
   },
   headerTitle: {
     margin: 0,
     color: "#f5f8ff",
-    fontSize: "21px",
+    fontSize: "20px",
     fontWeight: 700,
   },
   screenTitleBig: {
     color: "#f4f8ff",
     fontWeight: 700,
-    fontSize: "22px",
+    fontSize: "21px",
     marginBottom: "4px",
     flexShrink: 0,
   },
   screenSub: {
     color: "#8ea2c7",
     fontSize: "11px",
-    marginBottom: "14px",
+    marginBottom: "12px",
     flexShrink: 0,
   },
   topMetricGrid4: {
     display: "grid",
     gridTemplateColumns: "repeat(2, 1fr)",
     gap: "8px",
-    marginBottom: "14px",
+    marginBottom: "12px",
   },
   topMetricGrid3: {
     display: "grid",
     gridTemplateColumns: "repeat(3, 1fr)",
-    gap: "8px",
-    marginBottom: "14px",
+    gap: "6px",
+    marginBottom: "12px",
   },
   topMetricGrid2: {
     display: "grid",
     gridTemplateColumns: "repeat(2, 1fr)",
-    gap: "10px",
-    marginBottom: "16px",
+    gap: "8px",
+    marginBottom: "12px",
   },
   metricCardBlue: {
     borderRadius: "12px",
-    padding: "10px",
+    padding: "9px",
     background: "linear-gradient(180deg, rgba(20,35,62,0.98) 0%, rgba(12,24,45,0.98) 100%)",
     border: "1px solid rgba(83,162,255,0.18)",
     boxShadow: "inset 0 -3px 0 rgba(62,151,255,0.55)",
@@ -1261,7 +1201,7 @@ const styles = {
   },
   metricCardGreen: {
     borderRadius: "12px",
-    padding: "10px",
+    padding: "9px",
     background: "linear-gradient(180deg, rgba(20,54,45,0.98) 0%, rgba(12,35,30,0.98) 100%)",
     border: "1px solid rgba(64,220,150,0.2)",
     boxShadow: "inset 0 -3px 0 rgba(51,224,147,0.58)",
@@ -1270,66 +1210,66 @@ const styles = {
   metricLabel: {
     color: "#9db0d3",
     fontSize: "10px",
-    marginBottom: "6px",
+    marginBottom: "5px",
   },
   metricValueBig: {
     color: "#ffffff",
     fontWeight: 700,
-    fontSize: "16px",
+    fontSize: "15px",
     lineHeight: 1.1,
     wordBreak: "break-word",
   },
   metricValueSmall: {
     color: "#ffffff",
     fontWeight: 700,
-    fontSize: "14px",
+    fontSize: "13px",
     lineHeight: 1.15,
     wordBreak: "break-word",
   },
   metricSub: {
     color: "#a7b9dc",
-    fontSize: "11px",
+    fontSize: "10px",
     marginTop: "4px",
   },
   chartCard: {
-    borderRadius: "16px",
+    borderRadius: "14px",
     background: "rgba(7,14,26,0.75)",
     border: "1px solid rgba(255,255,255,0.06)",
-    padding: "14px",
-    marginBottom: "16px",
+    padding: "12px",
+    marginBottom: "12px",
   },
   chartCardLarge: {
-    borderRadius: "16px",
+    borderRadius: "14px",
     background: "rgba(7,14,26,0.75)",
     border: "1px solid rgba(255,255,255,0.06)",
-    padding: "14px",
-    marginBottom: "16px",
-    minHeight: "220px",
+    padding: "12px",
+    marginBottom: "12px",
+    minHeight: "200px",
   },
   chartTitle: {
     color: "#f6f9ff",
     fontWeight: 700,
-    fontSize: "15px",
-    marginBottom: "12px",
+    fontSize: "14px",
+    marginBottom: "10px",
   },
   chartArea: {
     position: "relative",
-    height: "220px",
+    height: "210px",
     display: "flex",
     alignItems: "flex-end",
     justifyContent: "space-between",
-    gap: "8px",
-    paddingTop: "18px",
+    gap: "6px",
+    paddingTop: "16px",
     backgroundImage: "linear-gradient(to top, rgba(255,255,255,0.05) 1px, transparent 1px)",
-    backgroundSize: "100% 36px",
+    backgroundSize: "100% 34px",
   },
   chartLineBarMix: {
-    height: "150px",
+    height: "140px",
     display: "flex",
     alignItems: "flex-end",
     gap: "6px",
     backgroundImage: "linear-gradient(to top, rgba(255,255,255,0.05) 1px, transparent 1px)",
-    backgroundSize: "100% 30px",
+    backgroundSize: "100% 28px",
   },
   chartColumnWrap: {
     flex: 1,
@@ -1341,7 +1281,7 @@ const styles = {
     height: "100%",
   },
   chartBar: {
-    width: "20px",
+    width: "18px",
     borderRadius: "8px 8px 0 0",
     background: "linear-gradient(180deg, #63e39b 0%, #2e9f67 100%)",
     boxShadow: "0 10px 20px rgba(40,170,110,0.2)",
@@ -1352,7 +1292,7 @@ const styles = {
     background: "linear-gradient(90deg, #2d84ff 0%, #4ba7ff 100%)",
   },
   chartDay: {
-    marginTop: "8px",
+    marginTop: "7px",
     color: "#8ea5c9",
     fontSize: "10px",
   },
@@ -1366,15 +1306,15 @@ const styles = {
   },
   historyList: {
     display: "grid",
-    gap: "8px",
-    marginBottom: "16px",
+    gap: "7px",
+    marginBottom: "12px",
   },
   historyRow: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: "12px",
-    padding: "12px 10px",
+    gap: "10px",
+    padding: "11px 9px",
     borderRadius: "10px",
     background: "rgba(255,255,255,0.03)",
     border: "1px solid rgba(255,255,255,0.05)",
@@ -1397,35 +1337,35 @@ const styles = {
   bottomMetricGrid2: {
     display: "grid",
     gridTemplateColumns: "repeat(2, 1fr)",
-    gap: "10px",
+    gap: "8px",
   },
   bottomMetricCard: {
-    borderRadius: "14px",
-    padding: "12px",
+    borderRadius: "12px",
+    padding: "10px",
     background: "rgba(255,255,255,0.04)",
     border: "1px solid rgba(255,255,255,0.07)",
   },
   bottomMetricValue: {
     color: "#ffffff",
-    fontSize: "16px",
+    fontSize: "15px",
     fontWeight: 700,
     marginTop: "4px",
   },
   actionsRow: {
-    marginTop: "10px",
-    marginBottom: "10px",
+    marginTop: "8px",
+    marginBottom: "8px",
     display: "grid",
-    gridTemplateColumns: "1fr 1fr 1fr",
-    gap: "8px",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "6px",
     flexShrink: 0,
   },
   bottomNav: {
-    marginTop: "8px",
+    marginTop: "4px",
     display: "grid",
     gridTemplateColumns: "repeat(4, 1fr)",
-    gap: "8px",
-    borderRadius: "16px",
-    padding: "10px",
+    gap: "6px",
+    borderRadius: "14px",
+    padding: "8px",
     background: "rgba(5,11,20,0.92)",
     border: "1px solid rgba(255,255,255,0.07)",
     flexShrink: 0,
@@ -1433,7 +1373,7 @@ const styles = {
   navBtn: {
     border: 0,
     borderRadius: "10px",
-    padding: "10px 6px",
+    padding: "9px 4px",
     background: "transparent",
     color: "#8ea4c9",
     fontSize: "11px",
@@ -1442,15 +1382,15 @@ const styles = {
   navActive: {
     border: 0,
     borderRadius: "10px",
-    padding: "10px 6px",
+    padding: "9px 4px",
     background: "linear-gradient(180deg, rgba(36,77,145,0.95) 0%, rgba(17,44,88,0.95) 100%)",
     color: "#ffffff",
     fontSize: "11px",
     cursor: "pointer",
   },
   alerta: {
-    marginBottom: "10px",
-    padding: "10px 12px",
+    marginBottom: "8px",
+    padding: "9px 10px",
     borderRadius: "12px",
     background: "rgba(77,163,255,0.10)",
     border: "1px solid rgba(77,163,255,0.18)",
