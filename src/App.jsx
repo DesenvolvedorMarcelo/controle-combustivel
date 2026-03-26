@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-const STORAGE_KEY = "fuel-tracker-pwa-v2";
+const STORAGE_KEY = "fuel-tracker-pwa-v3";
 const USERS_KEY = "fuel-tracker-users-v1";
 
 const vehicleInitial = {
@@ -44,6 +44,426 @@ function dataLabel(data) {
   if (!data) return "--/--/----";
   const [ano, mes, dia] = data.split("-");
   return `${dia}/${mes}/${ano}`;
+}
+
+function TelaLogin({ login, setLogin, entrar, irCadastro }) {
+  return (
+    <section style={styles.screenCard}>
+      <div style={styles.logoWrap}>
+        <div style={styles.logoIcon}>⛽</div>
+        <div style={styles.logoText}>Fuel Tracker</div>
+      </div>
+
+      <div style={styles.formStack}>
+        <input
+          style={styles.input}
+          placeholder="E-mail"
+          value={login.email}
+          onChange={(e) => setLogin((prev) => ({ ...prev, email: e.target.value }))}
+        />
+
+        <input
+          style={styles.input}
+          placeholder="Senha"
+          type="password"
+          value={login.senha}
+          onChange={(e) => setLogin((prev) => ({ ...prev, senha: e.target.value }))}
+        />
+
+        <div style={styles.smallLink}>Esqueceu a senha ?</div>
+
+        <button type="button" style={styles.primaryButton} onClick={entrar}>
+          Entrar
+        </button>
+      </div>
+
+      <button type="button" style={styles.linkButton} onClick={irCadastro}>
+        Cadastre-se
+      </button>
+    </section>
+  );
+}
+
+function TelaCadastroUsuario({
+  cadastro,
+  setCadastro,
+  cadastrarUsuario,
+  voltarLogin,
+}) {
+  return (
+    <section style={styles.screenCard}>
+      <div style={styles.headerRow}>
+        <span style={styles.backArrow}>‹</span>
+        <h2 style={styles.headerTitle}>Cadastro de Usuário</h2>
+      </div>
+
+      <div style={styles.formStack}>
+        <div>
+          <label style={styles.label}>Nome:</label>
+          <input
+            style={styles.input}
+            placeholder="Seu nome"
+            value={cadastro.nome}
+            onChange={(e) =>
+              setCadastro((prev) => ({ ...prev, nome: e.target.value }))
+            }
+          />
+        </div>
+
+        <div>
+          <label style={styles.label}>E-mail:</label>
+          <input
+            style={styles.input}
+            placeholder="seuemail@exemplo.com"
+            value={cadastro.email}
+            onChange={(e) =>
+              setCadastro((prev) => ({ ...prev, email: e.target.value }))
+            }
+          />
+        </div>
+
+        <div>
+          <label style={styles.label}>Senha:</label>
+          <input
+            style={styles.input}
+            type="password"
+            placeholder="Digite uma senha"
+            value={cadastro.senha}
+            onChange={(e) =>
+              setCadastro((prev) => ({ ...prev, senha: e.target.value }))
+            }
+          />
+        </div>
+
+        <div>
+          <label style={styles.label}>Confirmar senha:</label>
+          <input
+            style={styles.input}
+            type="password"
+            placeholder="Repita a senha"
+            value={cadastro.confirmarSenha}
+            onChange={(e) =>
+              setCadastro((prev) => ({
+                ...prev,
+                confirmarSenha: e.target.value,
+              }))
+            }
+          />
+        </div>
+
+        <button type="button" style={styles.primaryButton} onClick={cadastrarUsuario}>
+          Cadastrar usuário
+        </button>
+
+        <button type="button" style={styles.secondaryButton} onClick={voltarLogin}>
+          Voltar para login
+        </button>
+      </div>
+    </section>
+  );
+}
+
+function TelaVeiculo({ vehicle, setVehicle, salvarVeiculo }) {
+  return (
+    <section style={styles.screenCard}>
+      <div style={styles.headerRow}>
+        <span style={styles.backArrow}>‹</span>
+        <h2 style={styles.headerTitle}>Cadastro do Veículo</h2>
+      </div>
+
+      <div style={styles.formStack}>
+        <div>
+          <label style={styles.label}>Placa:</label>
+          <input
+            style={styles.input}
+            value={vehicle.placa}
+            onChange={(e) =>
+              setVehicle((prev) => ({ ...prev, placa: e.target.value }))
+            }
+          />
+        </div>
+
+        <div>
+          <label style={styles.label}>Modelo:</label>
+          <input
+            style={styles.input}
+            value={vehicle.modelo}
+            onChange={(e) =>
+              setVehicle((prev) => ({ ...prev, modelo: e.target.value }))
+            }
+          />
+        </div>
+
+        <div>
+          <label style={styles.label}>Ano:</label>
+          <input
+            style={styles.input}
+            value={vehicle.ano}
+            onChange={(e) =>
+              setVehicle((prev) => ({ ...prev, ano: e.target.value }))
+            }
+          />
+        </div>
+
+        <div>
+          <label style={styles.label}>Combustível:</label>
+          <select
+            style={styles.input}
+            value={vehicle.combustivel}
+            onChange={(e) =>
+              setVehicle((prev) => ({ ...prev, combustivel: e.target.value }))
+            }
+          >
+            <option>Gasolina</option>
+            <option>Etanol</option>
+            <option>Flex</option>
+          </select>
+        </div>
+
+        <div>
+          <label style={styles.label}>Média Cidade (km/L):</label>
+          <input
+            style={styles.input}
+            value={vehicle.mediaCidade}
+            onChange={(e) =>
+              setVehicle((prev) => ({ ...prev, mediaCidade: e.target.value }))
+            }
+          />
+        </div>
+
+        <div>
+          <label style={styles.label}>Potência:</label>
+          <input
+            style={styles.input}
+            value={vehicle.potencia}
+            onChange={(e) =>
+              setVehicle((prev) => ({ ...prev, potencia: e.target.value }))
+            }
+          />
+        </div>
+
+        <button type="button" style={styles.primaryButton} onClick={salvarVeiculo}>
+          Salvar
+        </button>
+      </div>
+    </section>
+  );
+}
+
+function TelaAbastecimento({
+  semanaKm,
+  resumo,
+  enriquecido,
+  form,
+  setForm,
+  adicionarAbastecimento,
+}) {
+  return (
+    <section style={styles.screenCard}>
+      <div style={styles.headerRow}>
+        <span style={styles.backArrow}>‹</span>
+        <h2 style={styles.headerTitle}>Registro de Abastecimento</h2>
+      </div>
+
+      <div style={styles.topMetricGrid3}>
+        <div style={styles.metricCardGreen}>
+          <div style={styles.metricLabel}>KM Rodados</div>
+          <div style={styles.metricValueSmall}>{Math.round(semanaKm)} km</div>
+        </div>
+
+        <div style={styles.metricCardBlue}>
+          <div style={styles.metricLabel}>Consumo Médio</div>
+          <div style={styles.metricValueSmall}>{numero(resumo.consumoMedio)} km/L</div>
+        </div>
+
+        <div style={styles.metricCardBlue}>
+          <div style={styles.metricLabel}>Custo por</div>
+          <div style={styles.metricValueSmall}>{moeda(resumo.custoPorKm)}</div>
+        </div>
+      </div>
+
+      <div style={styles.historyList}>
+        {enriquecido
+          .slice()
+          .reverse()
+          .map((item) => (
+            <div key={item.id} style={styles.historyRow}>
+              <div style={styles.historyLeft}>
+                <div style={styles.historyDate}>
+                  {dataLabel(item.data)} · {numero(item.litros)} L · {moeda(item.valor)}
+                </div>
+              </div>
+
+              <div style={styles.historyRight}>
+                {item.kmRodados > 0 ? `${Math.round(item.kmRodados)} km` : `${item.kmAtual} km`}
+              </div>
+            </div>
+          ))}
+      </div>
+
+      <div style={styles.formStackCompact}>
+        <input
+          style={styles.input}
+          type="date"
+          value={form.data}
+          onChange={(e) => setForm((prev) => ({ ...prev, data: e.target.value }))}
+        />
+
+        <input
+          style={styles.input}
+          placeholder="KM Atual"
+          value={form.kmAtual}
+          onChange={(e) => setForm((prev) => ({ ...prev, kmAtual: e.target.value }))}
+        />
+
+        <input
+          style={styles.input}
+          placeholder="Litros"
+          value={form.litros}
+          onChange={(e) => setForm((prev) => ({ ...prev, litros: e.target.value }))}
+        />
+
+        <input
+          style={styles.input}
+          placeholder="Valor"
+          value={form.valor}
+          onChange={(e) => setForm((prev) => ({ ...prev, valor: e.target.value }))}
+        />
+
+        <button type="button" style={styles.primaryButton} onClick={adicionarAbastecimento}>
+          + Adicionar Abastecimento
+        </button>
+      </div>
+    </section>
+  );
+}
+
+function TelaAnalise({ semanaValor, semanaKm, resumo, grafico }) {
+  return (
+    <section style={styles.screenCard}>
+      <div style={styles.headerRow}>
+        <span style={styles.backArrow}>‹</span>
+        <h2 style={styles.headerTitle}>Análise de Consumo</h2>
+      </div>
+
+      <div style={styles.topMetricGrid2}>
+        <div style={styles.metricCardGreen}>
+          <div style={styles.metricLabel}>Esta Semana</div>
+          <div style={styles.metricValueBig}>{moeda(semanaValor)}</div>
+          <div style={styles.metricSub}>{Math.round(semanaKm)} km</div>
+        </div>
+
+        <div style={styles.metricCardBlue}>
+          <div style={styles.metricLabel}>Este Mês</div>
+          <div style={styles.metricValueBig}>{moeda(resumo.totalValor)}</div>
+          <div style={styles.metricSub}>{Math.round(resumo.totalKm)} km</div>
+        </div>
+      </div>
+
+      <div style={styles.chartCard}>
+        <div style={styles.chartTitle}>Desempenho de Consumo</div>
+
+        <div style={styles.chartArea}>
+          {grafico.map((valor, index) => (
+            <div key={index} style={styles.chartColumnWrap}>
+              <div
+                style={{
+                  ...styles.chartBar,
+                  height: `${Math.max(24, valor * 10)}px`,
+                }}
+              />
+              <div style={styles.chartDay}>
+                {["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"][index] || `#${index + 1}`}
+              </div>
+            </div>
+          ))}
+
+          <svg style={styles.chartSvg} viewBox="0 0 320 150" preserveAspectRatio="none">
+            <polyline
+              fill="none"
+              stroke="#42a5ff"
+              strokeWidth="3"
+              points={grafico
+                .map((valor, index) => `${24 + index * 54},${132 - valor * 8}`)
+                .join(" ")}
+            />
+          </svg>
+        </div>
+      </div>
+
+      <div style={styles.bottomMetricGrid2}>
+        <div style={styles.bottomMetricCard}>
+          <div style={styles.metricLabel}>Média Semanal</div>
+          <div style={styles.bottomMetricValue}>{numero(resumo.consumoMedio)} km/L</div>
+        </div>
+
+        <div style={styles.bottomMetricCard}>
+          <div style={styles.metricLabel}>Custo Semanal</div>
+          <div style={styles.bottomMetricValue}>{moeda(semanaValor)}</div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TelaInicio({ usuarioAtual, resumo, grafico, ultimo }) {
+  return (
+    <section style={styles.screenCard}>
+      <div style={styles.screenTitleBig}>Controle de Combustível</div>
+      <div style={styles.screenSub}>
+        {usuarioAtual ? `Usuário: ${usuarioAtual.nome}` : "Visual escuro e responsivo"}
+      </div>
+
+      <div style={styles.topMetricGrid4}>
+        <div style={styles.metricCardBlue}>
+          <div style={styles.metricLabel}>Gastos da Vida</div>
+          <div style={styles.metricValueBig}>{moeda(resumo.totalValor)}</div>
+        </div>
+
+        <div style={styles.metricCardBlue}>
+          <div style={styles.metricLabel}>KM Rodados</div>
+          <div style={styles.metricValueBig}>{Math.round(resumo.totalKm)} km</div>
+        </div>
+
+        <div style={styles.metricCardBlue}>
+          <div style={styles.metricLabel}>Consumo Médio</div>
+          <div style={styles.metricValueBig}>{numero(resumo.consumoMedio)} km/L</div>
+        </div>
+
+        <div style={styles.metricCardBlue}>
+          <div style={styles.metricLabel}>Economia</div>
+          <div style={styles.metricValueBig}>82%</div>
+        </div>
+      </div>
+
+      <div style={styles.chartCardLarge}>
+        <div style={styles.chartTitle}>Desempenho Semanal</div>
+        <div style={styles.chartLineBarMix}>
+          {grafico.map((valor, index) => (
+            <div key={index} style={styles.chartColumnWrap}>
+              <div style={{ ...styles.miniBlueBar, width: "100%" }} />
+              <div style={styles.chartDay}>
+                {["SEG", "TER", "QUA", "QUI", "SEX", "SAB"][index] || `#${index + 1}`}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={styles.bottomMetricGrid2}>
+        <div style={styles.bottomMetricCard}>
+          <div style={styles.metricLabel}>Último Abastecimento</div>
+          <div style={styles.bottomMetricValue}>{ultimo ? `${Math.round(ultimo.litros)} L` : "--"}</div>
+          <div style={styles.metricSub}>{ultimo ? dataLabel(ultimo.data) : "sem dados"}</div>
+        </div>
+
+        <div style={styles.bottomMetricCard}>
+          <div style={styles.metricLabel}>Custo por KM</div>
+          <div style={styles.bottomMetricValue}>{moeda(resumo.custoPorKm)}</div>
+        </div>
+      </div>
+    </section>
+  );
 }
 
 export default function App() {
@@ -225,7 +645,6 @@ export default function App() {
       email: novoUsuario.email,
       senha: novoUsuario.senha,
     });
-
     setCadastro(cadastroInicial);
     setAba("login");
     setMensagem("Usuário cadastrado com sucesso. Agora entre com seu login.");
@@ -290,391 +709,6 @@ export default function App() {
     setInstalarEvento(null);
   }
 
-  function TelaLogin() {
-    return (
-      <section style={styles.screenCard}>
-        <div style={styles.logoWrap}>
-          <div style={styles.logoIcon}>⛽</div>
-          <div style={styles.logoText}>Fuel Tracker</div>
-        </div>
-
-        <form style={styles.formStack}>
-          <input
-            style={styles.input}
-            placeholder="E-mail"
-            value={login.email}
-            onChange={(e) => setLogin({ ...login, email: e.target.value })}
-          />
-
-          <input
-            style={styles.input}
-            placeholder="Senha"
-            type="password"
-            value={login.senha}
-            onChange={(e) => setLogin({ ...login, senha: e.target.value })}
-          />
-
-          <div style={styles.smallLink}>Esqueceu a senha ?</div>
-
-          <button type="button" style={styles.primaryButton} onClick={entrar}>
-            Entrar
-          </button>
-        </form>
-
-        <button type="button" style={styles.linkButton} onClick={() => setAba("cadastro-usuario")}>
-          Cadastre-se
-        </button>
-      </section>
-    );
-  }
-
-  function TelaCadastroUsuario() {
-    return (
-      <section style={styles.screenCard}>
-        <div style={styles.headerRow}>
-          <span style={styles.backArrow}>‹</span>
-          <h2 style={styles.headerTitle}>Cadastro de Usuário</h2>
-        </div>
-
-        <form style={styles.formStack}>
-          <div>
-            <label style={styles.label}>Nome:</label>
-            <input
-              style={styles.input}
-              placeholder="Seu nome"
-              value={cadastro.nome}
-              onChange={(e) => setCadastro({ ...cadastro, nome: e.target.value })}
-            />
-          </div>
-
-          <div>
-            <label style={styles.label}>E-mail:</label>
-            <input
-              style={styles.input}
-              placeholder="seuemail@exemplo.com"
-              value={cadastro.email}
-              onChange={(e) => setCadastro({ ...cadastro, email: e.target.value })}
-            />
-          </div>
-
-          <div>
-            <label style={styles.label}>Senha:</label>
-            <input
-              style={styles.input}
-              type="password"
-              placeholder="Digite uma senha"
-              value={cadastro.senha}
-              onChange={(e) => setCadastro({ ...cadastro, senha: e.target.value })}
-            />
-          </div>
-
-          <div>
-            <label style={styles.label}>Confirmar senha:</label>
-            <input
-              style={styles.input}
-              type="password"
-              placeholder="Repita a senha"
-              value={cadastro.confirmarSenha}
-              onChange={(e) => setCadastro({ ...cadastro, confirmarSenha: e.target.value })}
-            />
-          </div>
-
-          <button type="button" style={styles.primaryButton} onClick={cadastrarUsuario}>
-            Cadastrar usuário
-          </button>
-
-          <button type="button" style={styles.secondaryButton} onClick={() => setAba("login")}>
-            Voltar para login
-          </button>
-        </form>
-      </section>
-    );
-  }
-
-  function TelaVeiculo() {
-    return (
-      <section style={styles.screenCard}>
-        <div style={styles.headerRow}>
-          <span style={styles.backArrow}>‹</span>
-          <h2 style={styles.headerTitle}>Cadastro do Veículo</h2>
-        </div>
-
-        <form style={styles.formStack}>
-          <div>
-            <label style={styles.label}>Placa:</label>
-            <input
-              style={styles.input}
-              value={vehicle.placa}
-              onChange={(e) => setVehicle({ ...vehicle, placa: e.target.value })}
-            />
-          </div>
-
-          <div>
-            <label style={styles.label}>Modelo:</label>
-            <input
-              style={styles.input}
-              value={vehicle.modelo}
-              onChange={(e) => setVehicle({ ...vehicle, modelo: e.target.value })}
-            />
-          </div>
-
-          <div>
-            <label style={styles.label}>Ano:</label>
-            <input
-              style={styles.input}
-              value={vehicle.ano}
-              onChange={(e) => setVehicle({ ...vehicle, ano: e.target.value })}
-            />
-          </div>
-
-          <div>
-            <label style={styles.label}>Combustível:</label>
-            <select
-              style={styles.input}
-              value={vehicle.combustivel}
-              onChange={(e) => setVehicle({ ...vehicle, combustivel: e.target.value })}
-            >
-              <option>Gasolina</option>
-              <option>Etanol</option>
-              <option>Flex</option>
-            </select>
-          </div>
-
-          <div>
-            <label style={styles.label}>Média Cidade (km/L):</label>
-            <input
-              style={styles.input}
-              value={vehicle.mediaCidade}
-              onChange={(e) => setVehicle({ ...vehicle, mediaCidade: e.target.value })}
-            />
-          </div>
-
-          <div>
-            <label style={styles.label}>Potência:</label>
-            <input
-              style={styles.input}
-              value={vehicle.potencia}
-              onChange={(e) => setVehicle({ ...vehicle, potencia: e.target.value })}
-            />
-          </div>
-
-          <button type="button" style={styles.primaryButton} onClick={salvarVeiculo}>
-            Salvar
-          </button>
-        </form>
-      </section>
-    );
-  }
-
-  function TelaAbastecimento() {
-    return (
-      <section style={styles.screenCard}>
-        <div style={styles.headerRow}>
-          <span style={styles.backArrow}>‹</span>
-          <h2 style={styles.headerTitle}>Registro de Abastecimento</h2>
-        </div>
-
-        <div style={styles.topMetricGrid3}>
-          <div style={styles.metricCardGreen}>
-            <div style={styles.metricLabel}>KM Rodados</div>
-            <div style={styles.metricValueSmall}>{Math.round(semanaKm)} km</div>
-          </div>
-
-          <div style={styles.metricCardBlue}>
-            <div style={styles.metricLabel}>Consumo Médio</div>
-            <div style={styles.metricValueSmall}>{numero(resumo.consumoMedio)} km/L</div>
-          </div>
-
-          <div style={styles.metricCardBlue}>
-            <div style={styles.metricLabel}>Custo por</div>
-            <div style={styles.metricValueSmall}>{moeda(resumo.custoPorKm)}</div>
-          </div>
-        </div>
-
-        <div style={styles.historyList}>
-          {enriquecido
-            .slice()
-            .reverse()
-            .map((item) => (
-              <div key={item.id} style={styles.historyRow}>
-                <div style={styles.historyLeft}>
-                  <div style={styles.historyDate}>
-                    {dataLabel(item.data)} · {numero(item.litros)} L · {moeda(item.valor)}
-                  </div>
-                </div>
-
-                <div style={styles.historyRight}>
-                  {item.kmRodados > 0 ? `${Math.round(item.kmRodados)} km` : `${item.kmAtual} km`}
-                </div>
-              </div>
-            ))}
-        </div>
-
-        <form style={styles.formStackCompact}>
-          <input
-            style={styles.input}
-            type="date"
-            value={form.data}
-            onChange={(e) => setForm({ ...form, data: e.target.value })}
-          />
-
-          <input
-            style={styles.input}
-            placeholder="KM Atual"
-            value={form.kmAtual}
-            onChange={(e) => setForm({ ...form, kmAtual: e.target.value })}
-          />
-
-          <input
-            style={styles.input}
-            placeholder="Litros"
-            value={form.litros}
-            onChange={(e) => setForm({ ...form, litros: e.target.value })}
-          />
-
-          <input
-            style={styles.input}
-            placeholder="Valor"
-            value={form.valor}
-            onChange={(e) => setForm({ ...form, valor: e.target.value })}
-          />
-
-          <button type="button" style={styles.primaryButton} onClick={adicionarAbastecimento}>
-            + Adicionar Abastecimento
-          </button>
-        </form>
-      </section>
-    );
-  }
-
-  function TelaAnalise() {
-    return (
-      <section style={styles.screenCard}>
-        <div style={styles.headerRow}>
-          <span style={styles.backArrow}>‹</span>
-          <h2 style={styles.headerTitle}>Análise de Consumo</h2>
-        </div>
-
-        <div style={styles.topMetricGrid2}>
-          <div style={styles.metricCardGreen}>
-            <div style={styles.metricLabel}>Esta Semana</div>
-            <div style={styles.metricValueBig}>{moeda(semanaValor)}</div>
-            <div style={styles.metricSub}>{Math.round(semanaKm)} km</div>
-          </div>
-
-          <div style={styles.metricCardBlue}>
-            <div style={styles.metricLabel}>Este Mês</div>
-            <div style={styles.metricValueBig}>{moeda(resumo.totalValor)}</div>
-            <div style={styles.metricSub}>{Math.round(resumo.totalKm)} km</div>
-          </div>
-        </div>
-
-        <div style={styles.chartCard}>
-          <div style={styles.chartTitle}>Desempenho de Consumo</div>
-
-          <div style={styles.chartArea}>
-            {grafico.map((valor, index) => (
-              <div key={index} style={styles.chartColumnWrap}>
-                <div
-                  style={{
-                    ...styles.chartBar,
-                    height: `${Math.max(24, valor * 10)}px`,
-                  }}
-                />
-                <div style={styles.chartDay}>
-                  {["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"][index] || `#${index + 1}`}
-                </div>
-              </div>
-            ))}
-
-            <svg style={styles.chartSvg} viewBox="0 0 320 150" preserveAspectRatio="none">
-              <polyline
-                fill="none"
-                stroke="#42a5ff"
-                strokeWidth="3"
-                points={grafico
-                  .map((valor, index) => `${24 + index * 54},${132 - valor * 8}`)
-                  .join(" ")}
-              />
-            </svg>
-          </div>
-        </div>
-
-        <div style={styles.bottomMetricGrid2}>
-          <div style={styles.bottomMetricCard}>
-            <div style={styles.metricLabel}>Média Semanal</div>
-            <div style={styles.bottomMetricValue}>{numero(resumo.consumoMedio)} km/L</div>
-          </div>
-
-          <div style={styles.bottomMetricCard}>
-            <div style={styles.metricLabel}>Custo Semanal</div>
-            <div style={styles.bottomMetricValue}>{moeda(semanaValor)}</div>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  function TelaInicio() {
-    return (
-      <section style={styles.screenCard}>
-        <div style={styles.screenTitleBig}>Controle de Combustível</div>
-        <div style={styles.screenSub}>
-          {usuarioAtual ? `Usuário: ${usuarioAtual.nome}` : "Visual escuro e responsivo"}
-        </div>
-
-        <div style={styles.topMetricGrid4}>
-          <div style={styles.metricCardBlue}>
-            <div style={styles.metricLabel}>Gastos da Vida</div>
-            <div style={styles.metricValueBig}>{moeda(resumo.totalValor)}</div>
-          </div>
-
-          <div style={styles.metricCardBlue}>
-            <div style={styles.metricLabel}>KM Rodados</div>
-            <div style={styles.metricValueBig}>{Math.round(resumo.totalKm)} km</div>
-          </div>
-
-          <div style={styles.metricCardBlue}>
-            <div style={styles.metricLabel}>Consumo Médio</div>
-            <div style={styles.metricValueBig}>{numero(resumo.consumoMedio)} km/L</div>
-          </div>
-
-          <div style={styles.metricCardBlue}>
-            <div style={styles.metricLabel}>Economia</div>
-            <div style={styles.metricValueBig}>82%</div>
-          </div>
-        </div>
-
-        <div style={styles.chartCardLarge}>
-          <div style={styles.chartTitle}>Desempenho Semanal</div>
-          <div style={styles.chartLineBarMix}>
-            {grafico.map((valor, index) => (
-              <div key={index} style={styles.chartColumnWrap}>
-                <div style={{ ...styles.miniBlueBar, width: "100%" }} />
-                <div style={styles.chartDay}>
-                  {["SEG", "TER", "QUA", "QUI", "SEX", "SAB"][index] || `#${index + 1}`}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div style={styles.bottomMetricGrid2}>
-          <div style={styles.bottomMetricCard}>
-            <div style={styles.metricLabel}>Último Abastecimento</div>
-            <div style={styles.bottomMetricValue}>{ultimo ? `${Math.round(ultimo.litros)} L` : "--"}</div>
-            <div style={styles.metricSub}>{ultimo ? dataLabel(ultimo.data) : "sem dados"}</div>
-          </div>
-
-          <div style={styles.bottomMetricCard}>
-            <div style={styles.metricLabel}>Custo por KM</div>
-            <div style={styles.bottomMetricValue}>{moeda(resumo.custoPorKm)}</div>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
   return (
     <div style={styles.page}>
       <style>{css}</style>
@@ -683,12 +717,60 @@ export default function App() {
         <div style={styles.mobileFrame}>
           {mensagem && <div style={styles.alerta}>{mensagem}</div>}
 
-          {aba === "login" && <TelaLogin />}
-          {aba === "cadastro-usuario" && <TelaCadastroUsuario />}
-          {aba === "inicio" && <TelaInicio />}
-          {aba === "veiculo" && <TelaVeiculo />}
-          {aba === "abastecimento" && <TelaAbastecimento />}
-          {aba === "analise" && <TelaAnalise />}
+          {aba === "login" && (
+            <TelaLogin
+              login={login}
+              setLogin={setLogin}
+              entrar={entrar}
+              irCadastro={() => setAba("cadastro-usuario")}
+            />
+          )}
+
+          {aba === "cadastro-usuario" && (
+            <TelaCadastroUsuario
+              cadastro={cadastro}
+              setCadastro={setCadastro}
+              cadastrarUsuario={cadastrarUsuario}
+              voltarLogin={() => setAba("login")}
+            />
+          )}
+
+          {aba === "inicio" && (
+            <TelaInicio
+              usuarioAtual={usuarioAtual}
+              resumo={resumo}
+              grafico={grafico}
+              ultimo={ultimo}
+            />
+          )}
+
+          {aba === "veiculo" && (
+            <TelaVeiculo
+              vehicle={vehicle}
+              setVehicle={setVehicle}
+              salvarVeiculo={salvarVeiculo}
+            />
+          )}
+
+          {aba === "abastecimento" && (
+            <TelaAbastecimento
+              semanaKm={semanaKm}
+              resumo={resumo}
+              enriquecido={enriquecido}
+              form={form}
+              setForm={setForm}
+              adicionarAbastecimento={adicionarAbastecimento}
+            />
+          )}
+
+          {aba === "analise" && (
+            <TelaAnalise
+              semanaValor={semanaValor}
+              semanaKm={semanaKm}
+              resumo={resumo}
+              grafico={grafico}
+            />
+          )}
 
           {aba !== "login" && aba !== "cadastro-usuario" && (
             <>
@@ -820,12 +902,6 @@ const styles = {
     color: "#98abd0",
     fontSize: "12px",
     marginTop: "-4px",
-  },
-  bottomPlainLink: {
-    textAlign: "center",
-    color: "#9db3da",
-    marginTop: "120px",
-    fontSize: "14px",
   },
   linkButton: {
     marginTop: "120px",
