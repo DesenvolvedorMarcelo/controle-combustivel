@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
-const STORAGE_KEY = "fuel-tracker-pwa-v1";
+const STORAGE_KEY = "fuel-tracker-pwa-v2";
+const USERS_KEY = "fuel-tracker-users-v1";
 
 const vehicleInitial = {
   placa: "ABC1D23",
@@ -16,6 +17,13 @@ const abastecimentoInicial = {
   kmAtual: "",
   litros: "",
   valor: "",
+};
+
+const cadastroInicial = {
+  nome: "",
+  email: "",
+  senha: "",
+  confirmarSenha: "",
 };
 
 function moeda(valor) {
@@ -41,6 +49,8 @@ function dataLabel(data) {
 export default function App() {
   const [aba, setAba] = useState("login");
   const [login, setLogin] = useState({ email: "", senha: "" });
+  const [cadastro, setCadastro] = useState(cadastroInicial);
+  const [usuarioAtual, setUsuarioAtual] = useState(null);
   const [vehicle, setVehicle] = useState(vehicleInitial);
   const [form, setForm] = useState(abastecimentoInicial);
   const [historico, setHistorico] = useState([
@@ -58,11 +68,10 @@ export default function App() {
       const dados = JSON.parse(bruto);
 
       if (dados?.vehicle) setVehicle(dados.vehicle);
-      if (Array.isArray(dados?.historico) && dados.historico.length) {
-        setHistorico(dados.historico);
-      }
+      if (Array.isArray(dados?.historico)) setHistorico(dados.historico);
       if (dados?.login) setLogin(dados.login);
       if (dados?.aba) setAba(dados.aba);
+      if (dados?.usuarioAtual) setUsuarioAtual(dados.usuarioAtual);
     } catch (erro) {
       console.error("Erro ao carregar dados salvos:", erro);
     }
@@ -76,9 +85,10 @@ export default function App() {
         historico,
         login,
         aba,
+        usuarioAtual,
       })
     );
-  }, [vehicle, historico, login, aba]);
+  }, [vehicle, historico, login, aba, usuarioAtual]);
 
   useEffect(() => {
     const capturarInstall = (event) => {
@@ -142,9 +152,90 @@ export default function App() {
   const semanaValor = historico.slice(-2).reduce((soma, item) => soma + Number(item.valor), 0);
   const semanaKm = validos.slice(-2).reduce((soma, item) => soma + Number(item.kmRodados), 0);
 
+  function obterUsuarios() {
+    try {
+      const usuarios = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+      return Array.isArray(usuarios) ? usuarios : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function salvarUsuarios(usuarios) {
+    localStorage.setItem(USERS_KEY, JSON.stringify(usuarios));
+  }
+
   function entrar() {
+    if (!login.email || !login.senha) {
+      setMensagem("Preencha e-mail e senha.");
+      return;
+    }
+
+    const usuarios = obterUsuarios();
+    const usuario = usuarios.find(
+      (item) =>
+        item.email.trim().toLowerCase() === login.email.trim().toLowerCase() &&
+        item.senha === login.senha
+    );
+
+    if (!usuario) {
+      setMensagem("Usuário ou senha inválidos.");
+      return;
+    }
+
+    setUsuarioAtual({
+      nome: usuario.nome,
+      email: usuario.email,
+    });
     setAba("inicio");
-    setMensagem("Dados salvos localmente no seu aparelho.");
+    setMensagem(`Bem-vindo, ${usuario.nome}.`);
+  }
+
+  function cadastrarUsuario() {
+    if (!cadastro.nome || !cadastro.email || !cadastro.senha || !cadastro.confirmarSenha) {
+      setMensagem("Preencha todos os campos do cadastro.");
+      return;
+    }
+
+    if (cadastro.senha !== cadastro.confirmarSenha) {
+      setMensagem("As senhas não conferem.");
+      return;
+    }
+
+    const usuarios = obterUsuarios();
+    const emailJaExiste = usuarios.some(
+      (item) => item.email.trim().toLowerCase() === cadastro.email.trim().toLowerCase()
+    );
+
+    if (emailJaExiste) {
+      setMensagem("Já existe um usuário com esse e-mail.");
+      return;
+    }
+
+    const novoUsuario = {
+      id: Date.now(),
+      nome: cadastro.nome.trim(),
+      email: cadastro.email.trim(),
+      senha: cadastro.senha,
+    };
+
+    salvarUsuarios([...usuarios, novoUsuario]);
+
+    setLogin({
+      email: novoUsuario.email,
+      senha: novoUsuario.senha,
+    });
+
+    setCadastro(cadastroInicial);
+    setAba("login");
+    setMensagem("Usuário cadastrado com sucesso. Agora entre com seu login.");
+  }
+
+  function sair() {
+    setUsuarioAtual(null);
+    setLogin({ email: "", senha: "" });
+    setAba("login");
+    setMensagem("Você saiu da conta.");
   }
 
   function salvarVeiculo() {
@@ -181,6 +272,8 @@ export default function App() {
     setVehicle(vehicleInitial);
     setHistorico([]);
     setLogin({ email: "", senha: "" });
+    setCadastro(cadastroInicial);
+    setUsuarioAtual(null);
     setForm(abastecimentoInicial);
     setAba("login");
     setMensagem("Dados apagados.");
@@ -228,7 +321,72 @@ export default function App() {
           </button>
         </form>
 
-        <div style={styles.bottomPlainLink}>Cadastre-se</div>
+        <button type="button" style={styles.linkButton} onClick={() => setAba("cadastro-usuario")}>
+          Cadastre-se
+        </button>
+      </section>
+    );
+  }
+
+  function TelaCadastroUsuario() {
+    return (
+      <section style={styles.screenCard}>
+        <div style={styles.headerRow}>
+          <span style={styles.backArrow}>‹</span>
+          <h2 style={styles.headerTitle}>Cadastro de Usuário</h2>
+        </div>
+
+        <form style={styles.formStack}>
+          <div>
+            <label style={styles.label}>Nome:</label>
+            <input
+              style={styles.input}
+              placeholder="Seu nome"
+              value={cadastro.nome}
+              onChange={(e) => setCadastro({ ...cadastro, nome: e.target.value })}
+            />
+          </div>
+
+          <div>
+            <label style={styles.label}>E-mail:</label>
+            <input
+              style={styles.input}
+              placeholder="seuemail@exemplo.com"
+              value={cadastro.email}
+              onChange={(e) => setCadastro({ ...cadastro, email: e.target.value })}
+            />
+          </div>
+
+          <div>
+            <label style={styles.label}>Senha:</label>
+            <input
+              style={styles.input}
+              type="password"
+              placeholder="Digite uma senha"
+              value={cadastro.senha}
+              onChange={(e) => setCadastro({ ...cadastro, senha: e.target.value })}
+            />
+          </div>
+
+          <div>
+            <label style={styles.label}>Confirmar senha:</label>
+            <input
+              style={styles.input}
+              type="password"
+              placeholder="Repita a senha"
+              value={cadastro.confirmarSenha}
+              onChange={(e) => setCadastro({ ...cadastro, confirmarSenha: e.target.value })}
+            />
+          </div>
+
+          <button type="button" style={styles.primaryButton} onClick={cadastrarUsuario}>
+            Cadastrar usuário
+          </button>
+
+          <button type="button" style={styles.secondaryButton} onClick={() => setAba("login")}>
+            Voltar para login
+          </button>
+        </form>
       </section>
     );
   }
@@ -461,7 +619,9 @@ export default function App() {
     return (
       <section style={styles.screenCard}>
         <div style={styles.screenTitleBig}>Controle de Combustível</div>
-        <div style={styles.screenSub}>Visual escuro, exclusivo e responsivo com estilo mobile</div>
+        <div style={styles.screenSub}>
+          {usuarioAtual ? `Usuário: ${usuarioAtual.nome}` : "Visual escuro e responsivo"}
+        </div>
 
         <div style={styles.topMetricGrid4}>
           <div style={styles.metricCardBlue}>
@@ -524,16 +684,20 @@ export default function App() {
           {mensagem && <div style={styles.alerta}>{mensagem}</div>}
 
           {aba === "login" && <TelaLogin />}
+          {aba === "cadastro-usuario" && <TelaCadastroUsuario />}
           {aba === "inicio" && <TelaInicio />}
           {aba === "veiculo" && <TelaVeiculo />}
           {aba === "abastecimento" && <TelaAbastecimento />}
           {aba === "analise" && <TelaAnalise />}
 
-          {aba !== "login" && (
+          {aba !== "login" && aba !== "cadastro-usuario" && (
             <>
               <div style={styles.actionsRow}>
                 <button style={styles.secondaryButton} onClick={instalarApp}>
                   Instalar app
+                </button>
+                <button style={styles.secondaryButton} onClick={sair}>
+                  Sair
                 </button>
                 <button style={styles.dangerButton} onClick={limparTudo}>
                   Limpar dados
@@ -662,6 +826,15 @@ const styles = {
     color: "#9db3da",
     marginTop: "120px",
     fontSize: "14px",
+  },
+  linkButton: {
+    marginTop: "120px",
+    width: "100%",
+    background: "transparent",
+    border: 0,
+    color: "#9db3da",
+    fontSize: "14px",
+    cursor: "pointer",
   },
   primaryButton: {
     marginTop: "4px",
@@ -899,7 +1072,7 @@ const styles = {
     marginTop: "10px",
     marginBottom: "10px",
     display: "grid",
-    gridTemplateColumns: "1fr 1fr",
+    gridTemplateColumns: "1fr 1fr 1fr",
     gap: "8px",
   },
   bottomNav: {
