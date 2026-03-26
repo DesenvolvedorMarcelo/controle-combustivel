@@ -1,12 +1,14 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+const STORAGE_KEY = "fuel-tracker-pwa-v1";
 
 const vehicleInitial = {
-  placa: "PZI2B30",
-  modelo: "Ford/Ka Se ",
-  ano: "2017",
+  placa: "ABC1D23",
+  modelo: "Fiat Uno 1.0",
+  ano: "2018",
   combustivel: "Gasolina",
   mediaCidade: "12",
-  potencia: "85 cv",
+  potencia: "75 cv",
 };
 
 const abastecimentoInicial = {
@@ -46,6 +48,55 @@ export default function App() {
     { id: 2, data: "2026-03-20", kmAtual: 15602, litros: 30.2, valor: 170.0 },
     { id: 3, data: "2026-03-22", kmAtual: 16152, litros: 28.5, valor: 152.0 },
   ]);
+  const [instalarEvento, setInstalarEvento] = useState(null);
+  const [mensagem, setMensagem] = useState("");
+
+  useEffect(() => {
+    try {
+      const bruto = localStorage.getItem(STORAGE_KEY);
+      if (!bruto) return;
+      const dados = JSON.parse(bruto);
+
+      if (dados?.vehicle) setVehicle(dados.vehicle);
+      if (Array.isArray(dados?.historico) && dados.historico.length) {
+        setHistorico(dados.historico);
+      }
+      if (dados?.login) setLogin(dados.login);
+      if (dados?.aba) setAba(dados.aba);
+    } catch (erro) {
+      console.error("Erro ao carregar dados salvos:", erro);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        vehicle,
+        historico,
+        login,
+        aba,
+      })
+    );
+  }, [vehicle, historico, login, aba]);
+
+  useEffect(() => {
+    const capturarInstall = (event) => {
+      event.preventDefault();
+      setInstalarEvento(event);
+    };
+
+    window.addEventListener("beforeinstallprompt", capturarInstall);
+    return () => window.removeEventListener("beforeinstallprompt", capturarInstall);
+  }, []);
+
+  useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/service-worker.js")
+        .catch((erro) => console.error("Erro ao registrar service worker:", erro));
+    }
+  }, []);
 
   const enriquecido = useMemo(() => {
     return historico.map((item, index) => {
@@ -53,7 +104,13 @@ export default function App() {
       const kmRodados = anterior ? item.kmAtual - anterior.kmAtual : 0;
       const consumoMedio = anterior && item.litros > 0 ? kmRodados / item.litros : 0;
       const custoPorKm = anterior && kmRodados > 0 ? item.valor / kmRodados : 0;
-      return { ...item, kmRodados, consumoMedio, custoPorKm };
+
+      return {
+        ...item,
+        kmRodados,
+        consumoMedio,
+        custoPorKm,
+      };
     });
   }, [historico]);
 
@@ -65,7 +122,14 @@ export default function App() {
     const totalKm = validos.reduce((soma, item) => soma + Number(item.kmRodados), 0);
     const consumoMedio = totalLitros > 0 ? totalKm / totalLitros : 0;
     const custoPorKm = totalKm > 0 ? totalValor / totalKm : 0;
-    return { totalValor, totalLitros, totalKm, consumoMedio, custoPorKm };
+
+    return {
+      totalValor,
+      totalLitros,
+      totalKm,
+      consumoMedio,
+      custoPorKm,
+    };
   }, [historico, validos]);
 
   const grafico = useMemo(() => {
@@ -78,19 +142,21 @@ export default function App() {
   const semanaValor = historico.slice(-2).reduce((soma, item) => soma + Number(item.valor), 0);
   const semanaKm = validos.slice(-2).reduce((soma, item) => soma + Number(item.kmRodados), 0);
 
-  function entrar(e) {
-    e.preventDefault();
+  function entrar() {
     setAba("inicio");
+    setMensagem("Dados salvos localmente no seu aparelho.");
   }
 
-  function salvarVeiculo(e) {
-    e.preventDefault();
+  function salvarVeiculo() {
+    setMensagem("Veículo salvo com sucesso.");
     setAba("veiculo");
   }
 
-  function adicionarAbastecimento(e) {
-    e.preventDefault();
-    if (!form.data || !form.kmAtual || !form.litros || !form.valor) return;
+  function adicionarAbastecimento() {
+    if (!form.data || !form.kmAtual || !form.litros || !form.valor) {
+      setMensagem("Preencha data, km atual, litros e valor.");
+      return;
+    }
 
     const novo = {
       id: Date.now(),
@@ -103,7 +169,32 @@ export default function App() {
     const atualizados = [...historico, novo].sort((a, b) => a.kmAtual - b.kmAtual);
     setHistorico(atualizados);
     setForm(abastecimentoInicial);
+    setMensagem("Abastecimento salvo com sucesso.");
     setAba("abastecimento");
+  }
+
+  function limparTudo() {
+    const confirmar = window.confirm("Apagar todos os dados do app?");
+    if (!confirmar) return;
+
+    localStorage.removeItem(STORAGE_KEY);
+    setVehicle(vehicleInitial);
+    setHistorico([]);
+    setLogin({ email: "", senha: "" });
+    setForm(abastecimentoInicial);
+    setAba("login");
+    setMensagem("Dados apagados.");
+  }
+
+  async function instalarApp() {
+    if (!instalarEvento) {
+      setMensagem("No celular, abra no Chrome e toque em 'Adicionar à tela inicial'.");
+      return;
+    }
+
+    instalarEvento.prompt();
+    await instalarEvento.userChoice;
+    setInstalarEvento(null);
   }
 
   function TelaLogin() {
@@ -114,13 +205,14 @@ export default function App() {
           <div style={styles.logoText}>Fuel Tracker</div>
         </div>
 
-        <form onSubmit={entrar} style={styles.formStack}>
+        <form style={styles.formStack}>
           <input
             style={styles.input}
             placeholder="E-mail"
             value={login.email}
             onChange={(e) => setLogin({ ...login, email: e.target.value })}
           />
+
           <input
             style={styles.input}
             placeholder="Senha"
@@ -128,8 +220,10 @@ export default function App() {
             value={login.senha}
             onChange={(e) => setLogin({ ...login, senha: e.target.value })}
           />
+
           <div style={styles.smallLink}>Esqueceu a senha ?</div>
-          <button type="submit" style={styles.primaryButton}>
+
+          <button type="button" style={styles.primaryButton} onClick={entrar}>
             Entrar
           </button>
         </form>
@@ -147,7 +241,7 @@ export default function App() {
           <h2 style={styles.headerTitle}>Cadastro do Veículo</h2>
         </div>
 
-        <form onSubmit={salvarVeiculo} style={styles.formStack}>
+        <form style={styles.formStack}>
           <div>
             <label style={styles.label}>Placa:</label>
             <input
@@ -206,7 +300,7 @@ export default function App() {
             />
           </div>
 
-          <button type="submit" style={styles.primaryButton}>
+          <button type="button" style={styles.primaryButton} onClick={salvarVeiculo}>
             Salvar
           </button>
         </form>
@@ -227,10 +321,12 @@ export default function App() {
             <div style={styles.metricLabel}>KM Rodados</div>
             <div style={styles.metricValueSmall}>{Math.round(semanaKm)} km</div>
           </div>
+
           <div style={styles.metricCardBlue}>
             <div style={styles.metricLabel}>Consumo Médio</div>
             <div style={styles.metricValueSmall}>{numero(resumo.consumoMedio)} km/L</div>
           </div>
+
           <div style={styles.metricCardBlue}>
             <div style={styles.metricLabel}>Custo por</div>
             <div style={styles.metricValueSmall}>{moeda(resumo.custoPorKm)}</div>
@@ -248,6 +344,7 @@ export default function App() {
                     {dataLabel(item.data)} · {numero(item.litros)} L · {moeda(item.valor)}
                   </div>
                 </div>
+
                 <div style={styles.historyRight}>
                   {item.kmRodados > 0 ? `${Math.round(item.kmRodados)} km` : `${item.kmAtual} km`}
                 </div>
@@ -255,32 +352,36 @@ export default function App() {
             ))}
         </div>
 
-        <form onSubmit={adicionarAbastecimento} style={styles.formStackCompact}>
+        <form style={styles.formStackCompact}>
           <input
             style={styles.input}
             type="date"
             value={form.data}
             onChange={(e) => setForm({ ...form, data: e.target.value })}
           />
+
           <input
             style={styles.input}
             placeholder="KM Atual"
             value={form.kmAtual}
             onChange={(e) => setForm({ ...form, kmAtual: e.target.value })}
           />
+
           <input
             style={styles.input}
             placeholder="Litros"
             value={form.litros}
             onChange={(e) => setForm({ ...form, litros: e.target.value })}
           />
+
           <input
             style={styles.input}
             placeholder="Valor"
             value={form.valor}
             onChange={(e) => setForm({ ...form, valor: e.target.value })}
           />
-          <button type="submit" style={styles.primaryButton}>
+
+          <button type="button" style={styles.primaryButton} onClick={adicionarAbastecimento}>
             + Adicionar Abastecimento
           </button>
         </form>
@@ -302,6 +403,7 @@ export default function App() {
             <div style={styles.metricValueBig}>{moeda(semanaValor)}</div>
             <div style={styles.metricSub}>{Math.round(semanaKm)} km</div>
           </div>
+
           <div style={styles.metricCardBlue}>
             <div style={styles.metricLabel}>Este Mês</div>
             <div style={styles.metricValueBig}>{moeda(resumo.totalValor)}</div>
@@ -332,7 +434,9 @@ export default function App() {
                 fill="none"
                 stroke="#42a5ff"
                 strokeWidth="3"
-                points={grafico.map((valor, index) => `${24 + index * 54},${132 - valor * 8}`).join(" ")}
+                points={grafico
+                  .map((valor, index) => `${24 + index * 54},${132 - valor * 8}`)
+                  .join(" ")}
               />
             </svg>
           </div>
@@ -343,6 +447,7 @@ export default function App() {
             <div style={styles.metricLabel}>Média Semanal</div>
             <div style={styles.bottomMetricValue}>{numero(resumo.consumoMedio)} km/L</div>
           </div>
+
           <div style={styles.bottomMetricCard}>
             <div style={styles.metricLabel}>Custo Semanal</div>
             <div style={styles.bottomMetricValue}>{moeda(semanaValor)}</div>
@@ -363,14 +468,17 @@ export default function App() {
             <div style={styles.metricLabel}>Gastos da Vida</div>
             <div style={styles.metricValueBig}>{moeda(resumo.totalValor)}</div>
           </div>
+
           <div style={styles.metricCardBlue}>
             <div style={styles.metricLabel}>KM Rodados</div>
             <div style={styles.metricValueBig}>{Math.round(resumo.totalKm)} km</div>
           </div>
+
           <div style={styles.metricCardBlue}>
             <div style={styles.metricLabel}>Consumo Médio</div>
             <div style={styles.metricValueBig}>{numero(resumo.consumoMedio)} km/L</div>
           </div>
+
           <div style={styles.metricCardBlue}>
             <div style={styles.metricLabel}>Economia</div>
             <div style={styles.metricValueBig}>82%</div>
@@ -394,9 +502,10 @@ export default function App() {
         <div style={styles.bottomMetricGrid2}>
           <div style={styles.bottomMetricCard}>
             <div style={styles.metricLabel}>Último Abastecimento</div>
-            <div style={styles.bottomMetricValue}>{ultimo ? `${Math.round(ultimo.litros)} L` : "51 L"}</div>
-            <div style={styles.metricSub}>{ultimo ? dataLabel(ultimo.data) : "15/04/24"}</div>
+            <div style={styles.bottomMetricValue}>{ultimo ? `${Math.round(ultimo.litros)} L` : "--"}</div>
+            <div style={styles.metricSub}>{ultimo ? dataLabel(ultimo.data) : "sem dados"}</div>
           </div>
+
           <div style={styles.bottomMetricCard}>
             <div style={styles.metricLabel}>Custo por KM</div>
             <div style={styles.bottomMetricValue}>{moeda(resumo.custoPorKm)}</div>
@@ -409,8 +518,11 @@ export default function App() {
   return (
     <div style={styles.page}>
       <style>{css}</style>
+
       <div style={styles.mobileShell}>
         <div style={styles.mobileFrame}>
+          {mensagem && <div style={styles.alerta}>{mensagem}</div>}
+
           {aba === "login" && <TelaLogin />}
           {aba === "inicio" && <TelaInicio />}
           {aba === "veiculo" && <TelaVeiculo />}
@@ -418,23 +530,46 @@ export default function App() {
           {aba === "analise" && <TelaAnalise />}
 
           {aba !== "login" && (
-            <nav style={styles.bottomNav}>
-              <button style={aba === "inicio" ? styles.navActive : styles.navBtn} onClick={() => setAba("inicio")}>
-                Início
-              </button>
-              <button style={aba === "veiculo" ? styles.navActive : styles.navBtn} onClick={() => setAba("veiculo")}>
-                Veículo
-              </button>
-              <button
-                style={aba === "abastecimento" ? styles.navActive : styles.navBtn}
-                onClick={() => setAba("abastecimento")}
-              >
-                Abastecimento
-              </button>
-              <button style={aba === "analise" ? styles.navActive : styles.navBtn} onClick={() => setAba("analise")}>
-                Histórico
-              </button>
-            </nav>
+            <>
+              <div style={styles.actionsRow}>
+                <button style={styles.secondaryButton} onClick={instalarApp}>
+                  Instalar app
+                </button>
+                <button style={styles.dangerButton} onClick={limparTudo}>
+                  Limpar dados
+                </button>
+              </div>
+
+              <nav style={styles.bottomNav}>
+                <button
+                  style={aba === "inicio" ? styles.navActive : styles.navBtn}
+                  onClick={() => setAba("inicio")}
+                >
+                  Início
+                </button>
+
+                <button
+                  style={aba === "veiculo" ? styles.navActive : styles.navBtn}
+                  onClick={() => setAba("veiculo")}
+                >
+                  Veículo
+                </button>
+
+                <button
+                  style={aba === "abastecimento" ? styles.navActive : styles.navBtn}
+                  onClick={() => setAba("abastecimento")}
+                >
+                  Abastecimento
+                </button>
+
+                <button
+                  style={aba === "analise" ? styles.navActive : styles.navBtn}
+                  onClick={() => setAba("analise")}
+                >
+                  Histórico
+                </button>
+              </nav>
+            </>
           )}
         </div>
       </div>
@@ -471,7 +606,7 @@ const styles = {
     background: "linear-gradient(180deg, rgba(15,28,52,0.98) 0%, rgba(10,19,35,0.98) 100%)",
     border: "1px solid rgba(255,255,255,0.06)",
     padding: "18px",
-    minHeight: "710px",
+    minHeight: "680px",
   },
   logoWrap: {
     display: "flex",
@@ -539,6 +674,24 @@ const styles = {
     fontSize: "15px",
     cursor: "pointer",
     boxShadow: "0 10px 24px rgba(34,103,255,0.35)",
+  },
+  secondaryButton: {
+    border: "1px solid rgba(83,162,255,0.25)",
+    borderRadius: "10px",
+    padding: "11px 12px",
+    background: "rgba(255,255,255,0.03)",
+    color: "#dce6fa",
+    fontWeight: 600,
+    cursor: "pointer",
+  },
+  dangerButton: {
+    border: "1px solid rgba(255,120,120,0.25)",
+    borderRadius: "10px",
+    padding: "11px 12px",
+    background: "rgba(255,80,80,0.06)",
+    color: "#ffd0d0",
+    fontWeight: 600,
+    cursor: "pointer",
   },
   headerRow: {
     display: "flex",
@@ -742,8 +895,15 @@ const styles = {
     fontWeight: 700,
     marginTop: "4px",
   },
+  actionsRow: {
+    marginTop: "10px",
+    marginBottom: "10px",
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "8px",
+  },
   bottomNav: {
-    marginTop: "14px",
+    marginTop: "8px",
     display: "grid",
     gridTemplateColumns: "repeat(4, 1fr)",
     gap: "8px",
@@ -769,6 +929,15 @@ const styles = {
     color: "#ffffff",
     fontSize: "11px",
     cursor: "pointer",
+  },
+  alerta: {
+    marginBottom: "10px",
+    padding: "10px 12px",
+    borderRadius: "12px",
+    background: "rgba(77,163,255,0.10)",
+    border: "1px solid rgba(77,163,255,0.18)",
+    color: "#d7e7ff",
+    fontSize: "12px",
   },
 };
 
