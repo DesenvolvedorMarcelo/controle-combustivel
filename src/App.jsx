@@ -52,7 +52,15 @@ function dataLabel(data) {
   return `${dia}/${mes}/${ano}`;
 }
 
-function TelaLogin({ login, setLogin, entrar, irCadastro, irEsqueciSenha }) {
+function TelaLogin({
+  login,
+  setLogin,
+  entrar,
+  irCadastro,
+  irEsqueciSenha,
+  mostrarSenhaLogin,
+  setMostrarSenhaLogin,
+}) {
   return (
     <section style={styles.screenCard}>
       <div style={styles.logoWrap}>
@@ -68,13 +76,22 @@ function TelaLogin({ login, setLogin, entrar, irCadastro, irEsqueciSenha }) {
           onChange={(e) => setLogin((prev) => ({ ...prev, email: e.target.value }))}
         />
 
-        <input
-          style={styles.input}
-          placeholder="Senha"
-          type="password"
-          value={login.senha}
-          onChange={(e) => setLogin((prev) => ({ ...prev, senha: e.target.value }))}
-        />
+        <div style={styles.passwordWrap}>
+          <input
+            style={styles.inputWithButton}
+            placeholder="Senha"
+            type={mostrarSenhaLogin ? "text" : "password"}
+            value={login.senha}
+            onChange={(e) => setLogin((prev) => ({ ...prev, senha: e.target.value }))}
+          />
+          <button
+            type="button"
+            style={styles.passwordToggle}
+            onClick={() => setMostrarSenhaLogin((prev) => !prev)}
+          >
+            {mostrarSenhaLogin ? "Ocultar" : "Ver"}
+          </button>
+        </div>
 
         <button type="button" style={styles.smallLinkButton} onClick={irEsqueciSenha}>
           Esqueceu a senha ?
@@ -97,6 +114,10 @@ function TelaCadastroUsuario({
   setCadastro,
   cadastrarUsuario,
   voltarLogin,
+  mostrarSenhaCadastro,
+  setMostrarSenhaCadastro,
+  mostrarConfirmarCadastro,
+  setMostrarConfirmarCadastro,
 }) {
   return (
     <section style={styles.screenCard}>
@@ -115,9 +136,7 @@ function TelaCadastroUsuario({
               style={styles.input}
               placeholder="Seu nome"
               value={cadastro.nome}
-              onChange={(e) =>
-                setCadastro((prev) => ({ ...prev, nome: e.target.value }))
-              }
+              onChange={(e) => setCadastro((prev) => ({ ...prev, nome: e.target.value }))}
             />
           </div>
 
@@ -127,39 +146,53 @@ function TelaCadastroUsuario({
               style={styles.input}
               placeholder="seuemail@exemplo.com"
               value={cadastro.email}
-              onChange={(e) =>
-                setCadastro((prev) => ({ ...prev, email: e.target.value }))
-              }
+              onChange={(e) => setCadastro((prev) => ({ ...prev, email: e.target.value }))}
             />
           </div>
 
           <div>
             <label style={styles.label}>Senha:</label>
-            <input
-              style={styles.input}
-              type="password"
-              placeholder="Digite uma senha"
-              value={cadastro.senha}
-              onChange={(e) =>
-                setCadastro((prev) => ({ ...prev, senha: e.target.value }))
-              }
-            />
+            <div style={styles.passwordWrap}>
+              <input
+                style={styles.inputWithButton}
+                type={mostrarSenhaCadastro ? "text" : "password"}
+                placeholder="Digite uma senha"
+                value={cadastro.senha}
+                onChange={(e) => setCadastro((prev) => ({ ...prev, senha: e.target.value }))}
+              />
+              <button
+                type="button"
+                style={styles.passwordToggle}
+                onClick={() => setMostrarSenhaCadastro((prev) => !prev)}
+              >
+                {mostrarSenhaCadastro ? "Ocultar" : "Ver"}
+              </button>
+            </div>
           </div>
 
           <div>
             <label style={styles.label}>Confirmar senha:</label>
-            <input
-              style={styles.input}
-              type="password"
-              placeholder="Repita a senha"
-              value={cadastro.confirmarSenha}
-              onChange={(e) =>
-                setCadastro((prev) => ({
-                  ...prev,
-                  confirmarSenha: e.target.value,
-                }))
-              }
-            />
+            <div style={styles.passwordWrap}>
+              <input
+                style={styles.inputWithButton}
+                type={mostrarConfirmarCadastro ? "text" : "password"}
+                placeholder="Repita a senha"
+                value={cadastro.confirmarSenha}
+                onChange={(e) =>
+                  setCadastro((prev) => ({
+                    ...prev,
+                    confirmarSenha: e.target.value,
+                  }))
+                }
+              />
+              <button
+                type="button"
+                style={styles.passwordToggle}
+                onClick={() => setMostrarConfirmarCadastro((prev) => !prev)}
+              >
+                {mostrarConfirmarCadastro ? "Ocultar" : "Ver"}
+              </button>
+            </div>
           </div>
 
           <button type="button" style={styles.primaryButton} onClick={cadastrarUsuario}>
@@ -180,6 +213,10 @@ function TelaEsqueciSenha({
   setRedefinirSenha,
   salvarNovaSenha,
   voltarLogin,
+  mostrarNovaSenha,
+  setMostrarNovaSenha,
+  mostrarConfirmarNovaSenha,
+  setMostrarConfirmarNovaSenha,
 }) {
   return (
     <section style={styles.screenCard}>
@@ -206,31 +243,49 @@ function TelaEsqueciSenha({
 
           <div>
             <label style={styles.label}>Nova senha:</label>
-            <input
-              style={styles.input}
-              type="password"
-              placeholder="Digite a nova senha"
-              value={redefinirSenha.novaSenha}
-              onChange={(e) =>
-                setRedefinirSenha((prev) => ({ ...prev, novaSenha: e.target.value }))
-              }
-            />
+            <div style={styles.passwordWrap}>
+              <input
+                style={styles.inputWithButton}
+                type={mostrarNovaSenha ? "text" : "password"}
+                placeholder="Digite a nova senha"
+                value={redefinirSenha.novaSenha}
+                onChange={(e) =>
+                  setRedefinirSenha((prev) => ({ ...prev, novaSenha: e.target.value }))
+                }
+              />
+              <button
+                type="button"
+                style={styles.passwordToggle}
+                onClick={() => setMostrarNovaSenha((prev) => !prev)}
+              >
+                {mostrarNovaSenha ? "Ocultar" : "Ver"}
+              </button>
+            </div>
           </div>
 
           <div>
             <label style={styles.label}>Confirmar nova senha:</label>
-            <input
-              style={styles.input}
-              type="password"
-              placeholder="Repita a nova senha"
-              value={redefinirSenha.confirmarNovaSenha}
-              onChange={(e) =>
-                setRedefinirSenha((prev) => ({
-                  ...prev,
-                  confirmarNovaSenha: e.target.value,
-                }))
-              }
-            />
+            <div style={styles.passwordWrap}>
+              <input
+                style={styles.inputWithButton}
+                type={mostrarConfirmarNovaSenha ? "text" : "password"}
+                placeholder="Repita a nova senha"
+                value={redefinirSenha.confirmarNovaSenha}
+                onChange={(e) =>
+                  setRedefinirSenha((prev) => ({
+                    ...prev,
+                    confirmarNovaSenha: e.target.value,
+                  }))
+                }
+              />
+              <button
+                type="button"
+                style={styles.passwordToggle}
+                onClick={() => setMostrarConfirmarNovaSenha((prev) => !prev)}
+              >
+                {mostrarConfirmarNovaSenha ? "Ocultar" : "Ver"}
+              </button>
+            </div>
           </div>
 
           <button type="button" style={styles.primaryButton} onClick={salvarNovaSenha}>
@@ -261,9 +316,7 @@ function TelaVeiculo({ vehicle, setVehicle, salvarVeiculo }) {
             <input
               style={styles.input}
               value={vehicle.placa}
-              onChange={(e) =>
-                setVehicle((prev) => ({ ...prev, placa: e.target.value }))
-              }
+              onChange={(e) => setVehicle((prev) => ({ ...prev, placa: e.target.value }))}
             />
           </div>
 
@@ -272,9 +325,7 @@ function TelaVeiculo({ vehicle, setVehicle, salvarVeiculo }) {
             <input
               style={styles.input}
               value={vehicle.modelo}
-              onChange={(e) =>
-                setVehicle((prev) => ({ ...prev, modelo: e.target.value }))
-              }
+              onChange={(e) => setVehicle((prev) => ({ ...prev, modelo: e.target.value }))}
             />
           </div>
 
@@ -283,9 +334,7 @@ function TelaVeiculo({ vehicle, setVehicle, salvarVeiculo }) {
             <input
               style={styles.input}
               value={vehicle.ano}
-              onChange={(e) =>
-                setVehicle((prev) => ({ ...prev, ano: e.target.value }))
-              }
+              onChange={(e) => setVehicle((prev) => ({ ...prev, ano: e.target.value }))}
             />
           </div>
 
@@ -294,9 +343,7 @@ function TelaVeiculo({ vehicle, setVehicle, salvarVeiculo }) {
             <select
               style={styles.input}
               value={vehicle.combustivel}
-              onChange={(e) =>
-                setVehicle((prev) => ({ ...prev, combustivel: e.target.value }))
-              }
+              onChange={(e) => setVehicle((prev) => ({ ...prev, combustivel: e.target.value }))}
             >
               <option>Gasolina</option>
               <option>Etanol</option>
@@ -309,9 +356,7 @@ function TelaVeiculo({ vehicle, setVehicle, salvarVeiculo }) {
             <input
               style={styles.input}
               value={vehicle.mediaCidade}
-              onChange={(e) =>
-                setVehicle((prev) => ({ ...prev, mediaCidade: e.target.value }))
-              }
+              onChange={(e) => setVehicle((prev) => ({ ...prev, mediaCidade: e.target.value }))}
             />
           </div>
 
@@ -320,9 +365,7 @@ function TelaVeiculo({ vehicle, setVehicle, salvarVeiculo }) {
             <input
               style={styles.input}
               value={vehicle.potencia}
-              onChange={(e) =>
-                setVehicle((prev) => ({ ...prev, potencia: e.target.value }))
-              }
+              onChange={(e) => setVehicle((prev) => ({ ...prev, potencia: e.target.value }))}
             />
           </div>
 
@@ -572,6 +615,12 @@ export default function App() {
   ]);
   const [instalarEvento, setInstalarEvento] = useState(null);
   const [mensagem, setMensagem] = useState("");
+
+  const [mostrarSenhaLogin, setMostrarSenhaLogin] = useState(false);
+  const [mostrarSenhaCadastro, setMostrarSenhaCadastro] = useState(false);
+  const [mostrarConfirmarCadastro, setMostrarConfirmarCadastro] = useState(false);
+  const [mostrarNovaSenha, setMostrarNovaSenha] = useState(false);
+  const [mostrarConfirmarNovaSenha, setMostrarConfirmarNovaSenha] = useState(false);
 
   useEffect(() => {
     try {
@@ -859,6 +908,8 @@ export default function App() {
               entrar={entrar}
               irCadastro={() => setAba("cadastro-usuario")}
               irEsqueciSenha={() => setAba("esqueci-senha")}
+              mostrarSenhaLogin={mostrarSenhaLogin}
+              setMostrarSenhaLogin={setMostrarSenhaLogin}
             />
           )}
 
@@ -868,6 +919,10 @@ export default function App() {
               setCadastro={setCadastro}
               cadastrarUsuario={cadastrarUsuario}
               voltarLogin={() => setAba("login")}
+              mostrarSenhaCadastro={mostrarSenhaCadastro}
+              setMostrarSenhaCadastro={setMostrarSenhaCadastro}
+              mostrarConfirmarCadastro={mostrarConfirmarCadastro}
+              setMostrarConfirmarCadastro={setMostrarConfirmarCadastro}
             />
           )}
 
@@ -877,6 +932,10 @@ export default function App() {
               setRedefinirSenha={setRedefinirSenha}
               salvarNovaSenha={salvarNovaSenha}
               voltarLogin={() => setAba("login")}
+              mostrarNovaSenha={mostrarNovaSenha}
+              setMostrarNovaSenha={setMostrarNovaSenha}
+              mostrarConfirmarNovaSenha={mostrarConfirmarNovaSenha}
+              setMostrarConfirmarNovaSenha={setMostrarConfirmarNovaSenha}
             />
           )}
 
@@ -1054,6 +1113,33 @@ const styles = {
     padding: "12px 12px",
     fontSize: "14px",
     outline: "none",
+  },
+  passwordWrap: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+  },
+  inputWithButton: {
+    flex: 1,
+    boxSizing: "border-box",
+    borderRadius: "10px",
+    border: "1px solid rgba(255,255,255,0.12)",
+    background: "rgba(255,255,255,0.04)",
+    color: "#f7f9fe",
+    padding: "12px 12px",
+    fontSize: "14px",
+    outline: "none",
+  },
+  passwordToggle: {
+    border: "1px solid rgba(83,162,255,0.25)",
+    borderRadius: "10px",
+    padding: "12px 10px",
+    background: "rgba(255,255,255,0.03)",
+    color: "#dce6fa",
+    fontWeight: 600,
+    cursor: "pointer",
+    minWidth: "68px",
+    fontSize: "12px",
   },
   smallLinkButton: {
     textAlign: "right",
